@@ -1,35 +1,44 @@
-# People Over Papers Map Guide
+# People Over Papers Map
 
-Independent, mobile-first informational guide for people searching for the People Over Papers community map. This website is **not** the external project, ICEOUT, Pueblo Project, or an affiliate. It does not collect sightings, mirror live reports, issue alerts, or provide legal advice.
+Website: **https://peopleoverpapersmap.com/**  
+Contact: **peopleoverpapersmap@gmail.com**
 
-## Current implementation
-- Homepage clearly identifies the site as an independent guide.
-- Homepage guide, practical explanations, privacy guidance and curated legal-help resources.
-- Original explanatory content about reading crowdsourced reports cautiously and protecting privacy.
-- Curated legal-help directory linking to the US Department of Justice, DOJ accreditation roster, National Immigration Legal Services Directory and ILRC.
-- Mobile-first layout, accessible navigation, semantic headings, metadata, canonical URLs, Open Graph metadata, FAQ and WebSite JSON-LD, sitemap, robots rules and security headers.
-- No duplicate map, sighting submission form, public report API, or moderator dashboard. This avoids confusion with the original community service.
+A mobile-first information website with a homepage, practical map-reading guidance, community privacy information and a directory of immigration legal-help resources.
 
-## Deploy to Cloudflare Pages
-1. In Cloudflare, open **Workers & Pages → Create application → Pages → Connect to Git**.
-2. Authorize GitHub if prompted and select `sartajbj/Peopleoverpapers`.
-3. Set production branch to `main`.
-4. This is plain static HTML: leave the build command blank; set the build output directory to `.` (the repository root). Keep the root directory as `/` or default.
-5. Deploy. Cloudflare should provide a `*.pages.dev` preview URL.
-6. In the Pages project, open **Custom domains → Set up a custom domain**, add `peopleoverpapersmap.com`, and follow Cloudflare's DNS instructions. Add `www.peopleoverpapersmap.com` too only if you want it to redirect to the chosen canonical host.
-7. Test homepage, /resources.html, /privacy.html, /terms.html, mobile navigation and external destinations. Confirm HTTPS and canonical redirects.
+## Website features
+- Responsive homepage focused on People Over Papers map and community information.
+- Practical guidance for understanding crowdsourced reports and protecting privacy.
+- Curated legal-help directory with government and nonprofit resources.
+- Mobile navigation, semantic HTML, page metadata, canonical URLs, Open Graph metadata and FAQ/WebSite structured data.
+- Sitemap, robots.txt and security headers.
+- Static HTML/CSS/JavaScript. No database, report submission API, user accounts or moderation dashboard.
 
-This is a static guide and does not need D1, Pages Functions, a report database, or Wrangler configuration. Git integration automatically deploys new commits pushed to the connected production branch.
+## Cloudflare Pages deployment
+1. Open Cloudflare Dashboard → **Workers & Pages** → **Create application** → **Pages** → **Connect to Git**.
+2. Connect GitHub and select `sartajbj/Peopleoverpapers`.
+3. Production branch: `main`.
+4. Build command: leave blank.
+5. Build output directory: `.` (repository root).
+6. Deploy the project.
+7. In the Pages project, open **Custom domains** → **Set up a custom domain** and add `peopleoverpapersmap.com`.
+8. Follow the DNS instructions shown by Cloudflare. Enable HTTPS and test the homepage and all internal pages.
 
-## SEO and search visibility
-- Homepage title, description and H1 include the searched phrase while the visible disclaimer prevents affiliation confusion.
-- Canonical, Open Graph, FAQPage and WebSite structured data, internal links, sitemap and robots.txt are included.
-- Verify the domain in Google Search Console, submit `https://peopleoverpapersmap.com/sitemap.xml`, inspect the canonical homepage and request indexing once.
-- No one can guarantee a #1 Google position. Rankings depend on competition, site trust, links, content quality, user satisfaction, crawl/indexing and time. Avoid copied content, fake reviews, paid link schemes and misleading claims.
+Cloudflare Pages automatically deploys future commits pushed to the connected `main` branch. This static website does not need D1, Pages Functions or Wrangler.
 
-## Before launch
-- Confirm the domain is controlled by the site operator.
-- Publish a monitored contact address and a process for handling privacy questions and correction requests.
-- Have privacy and terms reviewed for the actual hosting, analytics and contact tools.
-- Test on real iOS/Android devices and major browsers.
-- Re-check external project links and legal directories periodically. Update the visible editorial review date only after a real review.
+## SEO checklist
+- Canonical homepage: https://peopleoverpapersmap.com/
+- Sitemap: https://peopleoverpapersmap.com/sitemap.xml
+- Robots: https://peopleoverpapersmap.com/robots.txt
+- Submit the sitemap in Google Search Console after the custom domain is live and verified.
+- Check canonical URLs, mobile rendering, internal navigation and page indexing after deployment.
+- Search ranking is not guaranteed; focus on useful original content, technical quality and a good visitor experience.
+
+## Contact
+For website corrections, privacy questions or general feedback: [peopleoverpapersmap@gmail.com](mailto:peopleoverpapersmap@gmail.com).
+
+## Before public launch
+- Confirm the custom domain is connected to this Cloudflare Pages project.
+- Test on real mobile devices and desktop browsers.
+- Review the privacy notice against the actual hosting and any analytics/advertising services enabled.
+- Keep the contact inbox monitored.
+- Review resource links periodically and update editorial review dates only after a real review.
