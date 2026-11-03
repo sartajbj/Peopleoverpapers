@@ -25,6 +25,7 @@ jobs:
           test -s styles.css
           test -s site.js
           test -s app.js
+          test -s admin.js
           test -s privacy.html
           test -s terms.html
           test -s sitemap.xml
