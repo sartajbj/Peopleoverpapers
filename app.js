@@ -24,7 +24,7 @@
     });
     $("reportCount").textContent=shown.length;
     $("feedCount").textContent=shown.length+" shown";
-    $("reportFeed").innerHTML=shown.slice(0,12).map(r=>'<button type="button" class="report-feed-item" data-lat="'+Number(r.lat)+'" data-lng="'+Number(r.lng)+'"><span class="dot '+escapeHtml(r.category)+'"></span><span><b>'+escapeHtml(labels[r.category]||"Community information")+'</b><small>'+escapeHtml(r.city)+", "+escapeHtml(r.state)+" · "+escapeHtml(r.observed_date||"Date not supplied")+'</small><span class="feed-description">'+escapeHtml(r.description)+'</span></span></button>').join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
+    $("reportFeed").innerHTML=shown.slice(0,12).map(r=>'<button type="button" class="report-feed-item" data-lat="'+Number(r.lat)+'" data-lng="'+Number(r.lng)+'"><span class="dot '+escapeHtml(r.category)+'"></span><span><b>'+escapeHtml(labels[r.category]||"Community information")+'</b><small>'+escapeHtml(r.city)+", "+escapeHtml(r.state)+'</small><small class="feed-meta">Occurred: '+escapeHtml(r.observed_date||"Date not supplied")+(r.observed_time?" · "+escapeHtml(r.observed_time):"")+"</small><small class=\"feed-meta\">Submitted: "+escapeHtml(r.submitted_at||"Time unavailable")+'</small><span class="feed-description">'+escapeHtml(r.description)+'</span></span></button>').join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
     $("reportFeed").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{map.setView([Number(b.dataset.lat),Number(b.dataset.lng)],9);}));
   }
   async function load(){
