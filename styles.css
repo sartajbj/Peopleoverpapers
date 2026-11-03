@@ -146,3 +146,5 @@ body{background:#fffdf9}
 
 /* Compact privacy reminder above the community map */
 .privacy-reminder{padding-top:0;padding-bottom:18px}.privacy-reminder p{margin:0;padding:17px 20px;border:1px solid #eadbd2;border-radius:15px;background:#fffdfa;color:#665c56;text-align:center;font-size:clamp(13px,1.7vw,16px);line-height:1.55}.privacy-reminder strong{color:#3d332e}
+
+.moderation-photo-wrap{margin:12px 0;padding:12px;background:#f8f5ef;border:1px solid var(--line);border-radius:12px}.moderation-photo{display:block;max-width:min(100%,420px);max-height:360px;object-fit:contain;border-radius:8px;background:#fff}.photo-upload{padding:14px!important;border:1px solid var(--line);border-radius:12px;background:#fbf8f2}.photo-upload input[type=file]{padding:8px!important;background:#fff!important}.photo-upload .field-hint{display:block;line-height:1.5;margin-top:5px}
