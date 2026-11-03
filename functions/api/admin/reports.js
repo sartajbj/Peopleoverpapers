@@ -1,5 +1,5 @@
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
-const decodePart=(part)=>JSON.parse(atob(part.replace(/-/g,"+").replace(/_/g,"/")));
+const decodePart=(part)=>{const value=part.replace(/-/g,"+").replace(/_/g,"/");return JSON.parse(atob(value+"=".repeat((4-value.length%4)%4)));};
 async function verifyAccess(request,env){
   const token=request.headers.get("Cf-Access-Jwt-Assertion");
   if(!token||!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD) return false;
