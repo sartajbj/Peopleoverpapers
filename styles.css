@@ -91,3 +91,20 @@ body{background:#fffdf9}
  .official-card{align-items:flex-start}
  .hero-lede{font-size:17px}
 }
+
+/* Interactive community map */
+.map-section{padding-top:72px;padding-bottom:78px}
+.map-layout{grid-template-columns:minmax(0,1fr) 290px}
+.map-frame{min-height:560px}
+#map{height:560px;min-height:560px;width:100%}
+.map-sidebar{padding:25px 22px}
+.map-sidebar .filter-row{display:grid;grid-template-columns:16px 12px 1fr;gap:9px;align-items:start}
+.map-sidebar .filter-row input{grid-column:1;grid-row:1}
+.map-sidebar .filter-row .dot{grid-column:2;grid-row:1}
+.map-sidebar .filter-row span:last-child{grid-column:3;grid-row:1}
+.map-attribution-note{pointer-events:none}
+.leaflet-container{font-family:"DM Sans",Arial,sans-serif}
+.leaflet-popup-content{line-height:1.55;max-width:230px}
+.map-pick-button{margin-top:8px}
+#reportForm button:disabled{opacity:.55;cursor:wait}
+@media(max-width:700px){.map-section{padding-top:48px;padding-bottom:52px}.map-layout{grid-template-columns:1fr}.map-frame,#map{height:430px;min-height:430px}.map-sidebar{padding:20px}.map-section .section-heading>.button{width:100%}}
