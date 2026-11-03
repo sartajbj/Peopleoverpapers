@@ -1,6 +1,6 @@
 (() => {
   const $ = (id) => document.getElementById(id);
-  const mapEl = $("map");
+  const mapEl = $("mapCanvas");
   if (!mapEl || !window.L) return;
   const colors = {critical:"#c94d38",active:"#d99b16",observed:"#79a94c",support:"#286b9b"};
   const labels = {critical:"Urgent concern",active:"Community update",observed:"Resource / support",support:"Other"};
@@ -40,7 +40,7 @@
   map.on("click",e=>{
     if(!pickingLocation) return;
     if(e.latlng.lat<24||e.latlng.lat>50||e.latlng.lng< -125||e.latlng.lng> -66){status("Choose an approximate location within the United States.");return;}
-    $("reportLat").value=e.latlng.lat.toFixed(2); $("reportLng").value=e.latlng.lng.toFixed(2);
+    $("reportLat").value=e.latlng.lat.toFixed(2); $("reportLng").value=e.latlng.lng.toFixed(2); if($("locationStatus")) $("locationStatus").textContent="Approximate area selected. You can change it on the map.";
     pickingLocation=false; dialog.showModal(); $("formAlert").textContent="Approximate area selected. Exact coordinates are generalized before storage.";
   });
   document.querySelectorAll(".filter-row input").forEach(x=>x.addEventListener("change",render));
@@ -56,14 +56,14 @@
     }catch{status("Place search is temporarily unavailable.");}
   });
   const dialog=$("reportDialog"),form=$("reportForm");
-  function close(){dialog.close();form.reset();$("formAlert").textContent="";}
+  function close(){dialog.close();form.reset();$("formAlert").textContent="";if($("locationStatus"))$("locationStatus").textContent="No location selected yet.";}
   $("openReport").addEventListener("click",()=>dialog.showModal());
   $("pickLocation").addEventListener("click",()=>{pickingLocation=true;dialog.close();status("Tap an approximate area on the map to select it.");map.getContainer().style.cursor="crosshair";});
   map.on("click",()=>{if(!pickingLocation)map.getContainer().style.cursor="";});
   $("closeReport").addEventListener("click",close); $("cancelReport").addEventListener("click",close);
   form.addEventListener("submit",async e=>{
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
-    if(!form.reportValidity())return;
+    if(!form.reportValidity())return; if(!form.lat.value||!form.lng.value){alert.textContent="Please choose an approximate area on the map first.";return;}
     const data=Object.fromEntries(new FormData(form).entries());
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
     const payload={category:data.category,city:data.city,state:data.state,lat:Number(data.lat),lng:Number(data.lng),observedAt:data.observedAt,observedTime:data.observedTime||"",description:data.description,website:data.website||""};
