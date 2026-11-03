@@ -83,7 +83,7 @@
   $("closeReport").addEventListener("click",close); $("cancelReport").addEventListener("click",close);
   async function prepareResourcePhoto(file){
     if(!file) return null;
-    if(!/^image\\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Please choose a JPG, PNG or WebP image.");
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Please choose a JPG, PNG or WebP image.");
     if(file.size>5*1024*1024) throw new Error("Choose an image smaller than 5 MB.");
     const bitmap=await createImageBitmap(file);
     const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));
