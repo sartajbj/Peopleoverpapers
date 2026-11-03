@@ -19,3 +19,13 @@
 .moderation-actions{display:flex;gap:10px;margin-top:18px}
 .moderation-actions .approve{background:#286b4c}.moderation-actions .reject{background:#a33e32}
 @media(max-width:600px){.admin-toolbar{align-items:flex-start;flex-direction:column}.moderation-actions{flex-wrap:wrap}}
+
+.resource-directory{padding-top:70px;padding-bottom:70px}
+.directory-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.directory-grid .resource-card{min-height:100%;display:flex;flex-direction:column}
+.directory-grid .resource-card .text-link{margin-top:auto;padding-top:18px}
+.notice-box{margin-top:25px;padding:25px 28px;background:#f5eee4;border-left:4px solid var(--rust);border-radius:10px;color:var(--ink)}
+.notice-box p{font-size:13px;color:var(--muted)}
+.notice-box a{color:var(--rust);font-weight:700;font-size:13px}
+.resource-hero{padding-top:70px;padding-bottom:70px}
+@media(max-width:760px){.directory-grid{grid-template-columns:1fr}.resource-directory{padding-top:50px;padding-bottom:50px}}
