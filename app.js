@@ -33,10 +33,12 @@
       render(); status(reports.length ? "Showing reviewed reports. New submissions are delayed at least 24 hours." : "No approved reports yet. Be the first to submit useful, non-identifying information.");
     }catch(e){status(e.message||"Unable to load reports. Please try again later.");}
   }
+  let pickingLocation=false;
   map.on("click",e=>{
-    const dialog=$("reportDialog");
-    if(!dialog.open) return;
+    if(!pickingLocation) return;
+    if(e.latlng.lat<24||e.latlng.lat>50||e.latlng.lng< -125||e.latlng.lng> -66){status("Choose an approximate location within the United States.");return;}
     $("reportLat").value=e.latlng.lat.toFixed(2); $("reportLng").value=e.latlng.lng.toFixed(2);
+    pickingLocation=false; dialog.showModal(); $("formAlert").textContent="Approximate area selected. Exact coordinates are generalized before storage.";
   });
   document.querySelectorAll(".filter-row input").forEach(x=>x.addEventListener("change",render));
   $("resetMap").addEventListener("click",()=>map.setView([39.2,-98.5],4));
@@ -53,6 +55,8 @@
   const dialog=$("reportDialog"),form=$("reportForm");
   function close(){dialog.close();form.reset();$("formAlert").textContent="";}
   $("openReport").addEventListener("click",()=>dialog.showModal());
+  $("pickLocation").addEventListener("click",()=>{pickingLocation=true;dialog.close();status("Tap an approximate area on the map to select it.");map.getContainer().style.cursor="crosshair";});
+  map.on("click",()=>{if(!pickingLocation)map.getContainer().style.cursor="";});
   $("closeReport").addEventListener("click",close); $("cancelReport").addEventListener("click",close);
   form.addEventListener("submit",async e=>{
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
