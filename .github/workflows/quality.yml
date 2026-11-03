@@ -18,6 +18,8 @@ jobs:
           node --check app.js
           node --check functions/api/reports.js
           node --check functions/api/admin/reports.js
+          node --check functions/api/report-photo/[id].js
+          node --check functions/api/admin/report-photo/[id].js
       - name: Check required site files
         run: |
           test -s index.html
@@ -32,8 +34,11 @@ jobs:
           test -s robots.txt
           test -s migrations/0001_init.sql
           test -s migrations/0002_add_observed_time.sql
+          test -s migrations/0003_add_report_photos.sql
           test -s functions/api/reports.js
           test -s functions/api/admin/reports.js
+          test -s functions/api/report-photo/[id].js
+          test -s functions/api/admin/report-photo/[id].js
           test -s admin/index.html
       - name: Check map and API integration markers
         run: |
