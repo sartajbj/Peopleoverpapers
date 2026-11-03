@@ -42,7 +42,7 @@ A moderator queue is included at `/admin.html`. It is not safe to expose until C
 3. Set Pages Functions environment variables (Production and Preview separately): `ACCESS_TEAM_DOMAIN` = your Cloudflare Access team issuer, e.g. `https://YOUR-TEAM.cloudflareaccess.com`; `ACCESS_AUD` = the application AUD tag shown in the Access application.
 4. Apply the new migration: `npx wrangler d1 migrations apply people-over-papers --remote`.
 5. Test access with an allowed moderator and a signed-out/unauthorized browser. The API independently validates the Cloudflare Access JWT; hiding the page alone is not security.
-6. Review and test the audit log table. Each approve/reject action records moderator email and timestamp.
+6. Review and test the audit log table. Each approve/reject action records moderator email and timestamp. The moderator can edit the public location label and description before approving, so identifying details can be redacted before publication.
 
 The reporting form includes a basic honeypot, server-side validation and approximate coordinates. This is not a complete anti-abuse system. Before accepting public submissions, configure Cloudflare rate limiting/WAF rules for `POST /api/reports`, monitor abuse, and consider Turnstile with server-side token validation. Do not claim the honeypot prevents spam.
 
