@@ -29,9 +29,13 @@ export async function onRequest({request,env}){
     const id=Number(body.id),status=String(body.status||"");
     if(!Number.isInteger(id)||id<1||!["approved","rejected"].includes(status))return json({error:"A valid report ID and approved/rejected status are required."},400);
     try{
-      const result=await env.DB.prepare("UPDATE reports SET status=?, reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND status='pending'").bind(status,id).run();
-      if(!result.meta?.changes)return json({error:"Report not found or already reviewed."},404);
-      await env.DB.prepare("INSERT INTO moderation_log (report_id,action,actor_email) VALUES (?,?,?)").bind(id,status,String((decodePart(request.headers.get("Cf-Access-Jwt-Assertion").split(".")[1]).email)||"cloudflare-access-user").slice(0,254)).run();
+      const claims=decodePart(request.headers.get("Cf-Access-Jwt-Assertion").split(".")[1]);
+      const actor=String(claims.email||"cloudflare-access-user").slice(0,254);
+      const results=await env.DB.batch([
+        env.DB.prepare("INSERT INTO moderation_log (report_id,action,actor_email) SELECT ?,?,? WHERE EXISTS (SELECT 1 FROM reports WHERE id=? AND status='pending')").bind(id,status,actor,id),
+        env.DB.prepare("UPDATE reports SET status=?, reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND status='pending'").bind(status,id)
+      ]);
+      if(!results[1]?.meta?.changes)return json({error:"Report not found or already reviewed."},404);
       return json({ok:true,id,status});
     }catch{return json({error:"Could not update report. Check that the latest database migration is applied."},500);}
   }
