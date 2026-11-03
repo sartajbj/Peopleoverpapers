@@ -27,5 +27,6 @@ jobs:
           test -s privacy.html
           test -s terms.html
           test -s admin.html
+          test -s resources.html
           test -s migrations/0001_init.sql
           test -s migrations/0002_moderation_log.sql
