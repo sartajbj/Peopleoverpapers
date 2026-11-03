@@ -4,7 +4,7 @@ export async function onRequest({request,env}) {
  if(!env.DB||!env.MODERATION_TOKEN)return json({error:"Moderation service is not configured."},503);
  if(!authorized(request,env))return json({error:"Unauthorized."},401);
  if(request.method==="GET"){
-  const {results=[]}=await env.DB.prepare("SELECT id,category,city,state,description,observed_date,submitted_at FROM reports WHERE status='pending' ORDER BY submitted_at ASC LIMIT 100").all();
+  const {results=[]}=await env.DB.prepare("SELECT id,category,city,state,description,observed_date,observed_time,submitted_at FROM reports WHERE status='pending' ORDER BY submitted_at ASC LIMIT 100").all();
   return json({reports:results});
  }
  if(request.method==="PATCH"){
