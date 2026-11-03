@@ -37,15 +37,33 @@
     }catch(e){status(e.message||"Unable to load reports. Please try again later.");}
   }
   let pickingLocation=false;
-  map.on("click",e=>{
+  map.on("click",async e=>{
     if(!pickingLocation) return;
     if(e.latlng.lat<24||e.latlng.lat>50||e.latlng.lng< -125||e.latlng.lng> -66){status("Choose an approximate location within the United States.");return;}
-    $("reportLat").value=e.latlng.lat.toFixed(2); $("reportLng").value=e.latlng.lng.toFixed(2); if($("locationStatus")) $("locationStatus").textContent="Approximate area selected. You can change it on the map.";
-    pickingLocation=false; dialog.showModal(); $("formAlert").textContent="Approximate area selected. Exact coordinates are generalized before storage.";
+    const lat=Number(e.latlng.lat.toFixed(1)),lng=Number(e.latlng.lng.toFixed(1));
+    $("reportLat").value=lat.toFixed(1); $("reportLng").value=lng.toFixed(1);
+    pickingLocation=false; map.getContainer().style.cursor="";
+    if($("locationStatus")) $("locationStatus").textContent="Approximate area selected. Looking up city and state…";
+    dialog.showModal();
+    $("formAlert").textContent="Approximate area selected. Only a generalized area is saved.";
+    try{
+      const url="https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+encodeURIComponent(lat)+"&lon="+encodeURIComponent(lng)+"&zoom=10&addressdetails=1";
+      const res=await fetch(url,{headers:{Accept:"application/json"}});
+      if(!res.ok) throw new Error("Location details unavailable.");
+      const result=await res.json(),addr=result.address||{};
+      const city=addr.city||addr.town||addr.village||addr.municipality||addr.county||"";
+      const stateName=addr.state||"";
+      const stateMap={"Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY","District of Columbia":"DC"};
+      if(city && !$("reportForm").elements.city.value) $("reportForm").elements.city.value=city;
+      if(stateMap[stateName] && !$("reportForm").elements.state.value) $("reportForm").elements.state.value=stateMap[stateName];
+      if($("locationStatus")) $("locationStatus").textContent=(city?city+", ":"")+"Approximate area selected. Check city/state before submitting.";
+    }catch{
+      if($("locationStatus")) $("locationStatus").textContent="Approximate area selected. Please enter city and state manually.";
+    }
   });
   document.querySelectorAll(".filter-row input").forEach(x=>x.addEventListener("change",render));
   $("resetMap").addEventListener("click",()=>map.setView([39.2,-98.5],4));
-  $("searchMap").addEventListener("click",async()=>{
+  async function searchPlace(){
     const q=$("mapSearch").value.trim(); if(!q)return;
     status("Searching…");
     try{
@@ -54,7 +72,9 @@
       if(!hits.length){status("No U.S. place found. Try a city and state.");return;}
       map.setView([Number(hits[0].lat),Number(hits[0].lon)],10); status("Map centered on "+q+".");
     }catch{status("Place search is temporarily unavailable.");}
-  });
+  }
+  $("searchMap").addEventListener("click",searchPlace);
+  $("mapSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchPlace();}});
   const dialog=$("reportDialog"),form=$("reportForm");
   function close(){dialog.close();form.reset();$("formAlert").textContent="";if($("locationStatus"))$("locationStatus").textContent="No location selected yet.";}
   $("openReport").addEventListener("click",()=>dialog.showModal());
