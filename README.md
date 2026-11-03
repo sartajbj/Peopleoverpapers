@@ -33,3 +33,18 @@ Leaflet and OpenStreetMap tiles are loaded from public CDNs/services. Location s
 
 ## Local preview
 Serve the repository root with a local static server. Pages Functions and D1 require the Cloudflare Pages/Wrangler development environment to test the API end-to-end.
+
+
+## Secure moderation (Cloudflare Access)
+A moderator queue is included at `/admin.html`. It is not safe to expose until Cloudflare Access is configured:
+1. In Cloudflare Zero Trust, create an Access self-hosted application protecting both `peopleoverpapersmap.com/admin.html` and `peopleoverpapersmap.com/api/admin/*` (include the www hostname if it serves the site).
+2. Create an allow policy for the specific moderator email addresses only. Do not use an Everyone/Any-email policy.
+3. Set Pages Functions environment variables (Production and Preview separately): `ACCESS_TEAM_DOMAIN` = your Cloudflare Access team issuer, e.g. `https://YOUR-TEAM.cloudflareaccess.com`; `ACCESS_AUD` = the application AUD tag shown in the Access application.
+4. Apply the new migration: `npx wrangler d1 migrations apply people-over-papers --remote`.
+5. Test access with an allowed moderator and a signed-out/unauthorized browser. The API independently validates the Cloudflare Access JWT; hiding the page alone is not security.
+6. Review and test the audit log table. Each approve/reject action records moderator email and timestamp.
+
+The reporting form includes a basic honeypot, server-side validation and approximate coordinates. This is not a complete anti-abuse system. Before accepting public submissions, configure Cloudflare rate limiting/WAF rules for `POST /api/reports`, monitor abuse, and consider Turnstile with server-side token validation. Do not claim the honeypot prevents spam.
+
+## Go-live blockers
+The repository changes do not create or configure your Cloudflare account, D1 database, Access policy, domain DNS, or production deployment. Those account-side steps and real-device/browser tests must be completed before the site can be called live or production-ready. Verify the contact email before launch.
