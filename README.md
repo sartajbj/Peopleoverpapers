@@ -48,3 +48,7 @@ The reporting form includes a basic honeypot, server-side validation and approxi
 
 ## Go-live blockers
 The repository changes do not create or configure your Cloudflare account, D1 database, Access policy, domain DNS, or production deployment. Those account-side steps and real-device/browser tests must be completed before the site can be called live or production-ready. Verify the contact email before launch.
+
+
+## Curated public resources
+`resources.html` links to the U.S. Department of Justice EOIR legal representation and accreditation pages, the National Immigration Legal Services Directory, and ILRC know-your-rights/family-preparedness materials. These are external sources, not endorsements; visitors are told to verify current provider availability and credentials.
