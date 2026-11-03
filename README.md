@@ -7,11 +7,11 @@ A mobile-first U.S. community information map with moderated report submissions,
 
 ## Features
 - Leaflet map with U.S. report markers, category filters, place search and mobile layout.
-- Report submission form with category, city/state, approximate coordinates, date and non-identifying description.
+- Report submission form with category, city/state, a map-selected approximate area, date, optional time and non-identifying description.
 - Cloudflare Pages Functions API backed by D1.
 - Submissions remain private and pending until a moderator approves them.
 - Public reports are delayed at least 24 hours and coordinates are rounded to one decimal degree (roughly 10–11 km).
-- No names, faces, phone numbers, email addresses, street addresses, license plates or other identifying details are allowed.
+- No names, faces, phone numbers, email addresses, street addresses, license plates or other identifying details are allowed. Photo uploads are not enabled; do not submit identifying images.
 - Private moderation screen at `/admin/`, protected by a secret token.
 - Legal resources, Privacy, Terms, sitemap, robots.txt and security headers.
 
@@ -30,7 +30,7 @@ This map is **not** a live incident tracker, emergency alert system or a tool fo
 1. Cloudflare Dashboard → **Storage & databases** → **D1 SQL Database** → **Create**.
 2. Name it `peopleoverpapers-reports`.
 3. Open the database → **Console**.
-4. Run the complete SQL in `migrations/0001_init.sql`.
+4. Run `migrations/0001_init.sql` first, then run `migrations/0002_add_observed_time.sql` in the same D1 database.
 
 ### 3. Bind D1 to Pages
 1. Open Workers & Pages → your Pages project → **Settings** → **Functions**.
