@@ -66,7 +66,7 @@
     if(!form.reportValidity())return;
     const data=Object.fromEntries(new FormData(form).entries());
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
-    const payload={category:data.category,city:data.city,state:data.state,lat:Number(data.lat),lng:Number(data.lng),observedAt:data.observedAt,description:data.description,website:data.website||""};
+    const payload={category:data.category,city:data.city,state:data.state,lat:Number(data.lat),lng:Number(data.lng),observedAt:data.observedAt,observedTime:data.observedTime||"",description:data.description,website:data.website||""};
     btn.disabled=true; alert.className="form-alert"; alert.textContent="Sending securely for review…";
     try{
       const res=await fetch("/api/reports",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(payload)});
