@@ -45,10 +45,13 @@ This map is **not** a live incident tracker, emergency alert system or a tool fo
 3. Use a long, random secret (at least 32 random characters); do not put it in GitHub, README, or browser code.
 4. Save and redeploy.
 
-### 5. Connect the custom domain
+### 5. Add submission abuse protection
+Create a Cloudflare rate-limiting rule for `POST /api/reports` (for example, a low per-IP request threshold over 10 minutes) and monitor it after launch. Keep the moderation token private and rotate it if exposed.
+
+### 6. Connect the custom domain
 Open Pages → **Custom domains** → **Set up a custom domain** → add `peopleoverpapersmap.com`, then follow the DNS instructions Cloudflare displays. Confirm HTTPS.
 
-### 6. First-run verification
+### 7. First-run verification
 - Open the homepage and confirm the map tiles load.
 - Submit one harmless test report using a broad city-area location and non-identifying text.
 - Open `/admin/`, enter the moderation token and approve the test report.
