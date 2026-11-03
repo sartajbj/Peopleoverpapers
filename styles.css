@@ -122,3 +122,17 @@ body{background:#fffdf9}
 .report-feed-item small{font-size:10px;color:var(--muted);margin:3px 0 6px}
 .feed-description{font-size:12px;line-height:1.45;color:#665a53}
 @media(max-width:700px){.report-feed{grid-template-columns:1fr}.report-feed-wrap{padding:16px}}
+
+/* Map legend and wordmark */
+.map-brand-badge{position:absolute;z-index:450;top:14px;left:14px;display:flex;align-items:center;gap:9px;background:#fffaf1ed;padding:9px 13px;border-radius:9px;box-shadow:0 3px 14px #1235;color:#69351f}
+.map-brand-mark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#07545a;color:#fff;font:800 15px Manrope}
+.map-brand-mark span{color:#f1b08a}
+.map-brand-badge b{display:block;font:800 12px/1.2 Manrope;letter-spacing:.04em}
+.map-brand-badge small{display:block;font:700 8px/1.4 "DM Sans";letter-spacing:.12em;color:#07545a}
+.map-legend{position:absolute;z-index:450;right:14px;top:14px;min-width:185px;padding:13px 16px;background:#ffffffed;border:1px solid #ffffff;border-radius:16px;box-shadow:0 5px 18px #143a3a30;color:#38291f}
+.map-legend h3{font:800 17px Manrope;margin:0 0 7px;color:#38291f}
+.map-legend>div{display:flex;align-items:center;gap:9px;font-size:13px;line-height:1.9}
+.legend-pin{display:inline-block;width:13px;height:13px;border:2px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 1px 3px #3336}
+.legend-pin.critical{background:#c94d38}.legend-pin.active{background:#d99b16}.legend-pin.observed{background:#79a94c}.legend-pin.support{background:#286b9b}
+.report-feed-item small{display:block}.feed-meta{font-size:10px;color:#81736a;margin-top:4px;display:block}
+@media(max-width:700px){.map-brand-badge{top:10px;left:10px;padding:7px 9px}.map-brand-mark{width:30px;height:30px;font-size:12px}.map-brand-badge b{font-size:9px}.map-brand-badge small{font-size:7px}.map-legend{top:10px;right:10px;min-width:145px;padding:9px 11px;border-radius:12px}.map-legend h3{font-size:13px}.map-legend>div{font-size:10px;line-height:1.8}.map-frame,#map{min-height:430px}}
