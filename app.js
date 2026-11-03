@@ -18,7 +18,7 @@
     const chosen=visibleCategories();
     const shown=reports.filter(r=>chosen.includes(r.category));
     shown.forEach(r=>{
-      const marker=L.circleMarker([r.lat,r.lng],{radius:9,color:"#fff",weight:2,fillColor:colors[r.category]||colors.support,fillOpacity:.9});
+      const marker=L.marker([r.lat,r.lng],{icon:L.divIcon({className:"community-pin-wrap",html:'<span class="community-pin '+(colors[r.category]?"":"") + escapeHtml(r.category)+'"><i></i></span>',iconSize:[28,36],iconAnchor:[14,34],popupAnchor:[0,-30]})});
       marker.bindPopup('<strong>'+escapeHtml(labels[r.category]||"Community information")+'</strong><br>'+escapeHtml(r.city)+', '+escapeHtml(r.state)+'<br><small>'+escapeHtml(r.observed_date||"Date not supplied")+'</small><p>'+escapeHtml(r.description)+'</p><small>Approximate area · reviewed report</small>');
       marker.addTo(layer);
     });
