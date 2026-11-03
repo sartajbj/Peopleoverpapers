@@ -23,7 +23,7 @@ Mobile-first community information website inspired by the broad interaction pat
 - Implement authenticated moderator access, review/audit history, report correction/deletion, abuse throttling, spam protection and an operational contact process.
 - Decide and document retention, backups, incident response and privacy request procedures.
 - Have privacy, terms, community safety and legal-resource content reviewed by qualified people.
-- Verify the contact email and publish a real, monitored support channel.
+- Publish a verified, monitored contact email and a process for privacy, correction and deletion requests. No contact address has been confirmed in this repository.
 - Consider an approved resource directory with verified organizations, last-checked dates and clear service-area information.
 - The initial form deliberately accepts text and approximate location only; it does not upload images/video or expose contributor identities.
 - This project is not an emergency service or a substitute for legal advice.
