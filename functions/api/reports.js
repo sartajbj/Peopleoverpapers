@@ -46,8 +46,3 @@ export async function onRequestPost({ request, env }) {
     return json({ error: "The report could not be saved. Please try again later." }, 500);
   }
 }
-export async function onRequest({ request, next }) {
-  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { "Allow": "GET, POST, OPTIONS" } });
-  if (!["GET", "POST"].includes(request.method)) return json({ error: "Method not allowed." }, 405);
-  return next();
-}
