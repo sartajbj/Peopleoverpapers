@@ -1,10 +1,10 @@
 # People Over Papers Map Guide
 
-Independent, mobile-first informational guide for people searching for the People Over Papers community map. This website is **not** the official People Over Papers project, ICEOUT, Pueblo Project, or an affiliate. It does not collect sightings, mirror live reports, issue alerts, or provide legal advice.
+Independent, mobile-first informational guide for people searching for the People Over Papers community map. This website is **not** the external project, ICEOUT, Pueblo Project, or an affiliate. It does not collect sightings, mirror live reports, issue alerts, or provide legal advice.
 
 ## Current implementation
 - Homepage clearly identifies the site as an independent guide.
-- Direct link to the community project's map at https://iceout.org/en/ and its public link page.
+- Homepage guide, practical explanations, privacy guidance and curated legal-help resources.
 - Original explanatory content about reading crowdsourced reports cautiously and protecting privacy.
 - Curated legal-help directory linking to the US Department of Justice, DOJ accreditation roster, National Immigration Legal Services Directory and ILRC.
 - Mobile-first layout, accessible navigation, semantic headings, metadata, canonical URLs, Open Graph metadata, FAQ and WebSite JSON-LD, sitemap, robots rules and security headers.
