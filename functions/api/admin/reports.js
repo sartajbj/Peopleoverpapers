@@ -27,13 +27,15 @@ export async function onRequest({request,env}){
   if(request.method==="PATCH"){
     let body;try{body=await request.json();}catch{return json({error:"Invalid JSON."},400);}
     const id=Number(body.id),status=String(body.status||"");
+    const location=String(body.location_label||"").trim(),description=String(body.description||"").trim();
     if(!Number.isInteger(id)||id<1||!["approved","rejected"].includes(status))return json({error:"A valid report ID and approved/rejected status are required."},400);
+    if(location.length<2||location.length>120||description.length<30||description.length>1500)return json({error:"Edited location or description is outside the allowed length."},400);
     try{
       const claims=decodePart(request.headers.get("Cf-Access-Jwt-Assertion").split(".")[1]);
       const actor=String(claims.email||"cloudflare-access-user").slice(0,254);
       const results=await env.DB.batch([
         env.DB.prepare("INSERT INTO moderation_log (report_id,action,actor_email) SELECT ?,?,? WHERE EXISTS (SELECT 1 FROM reports WHERE id=? AND status='pending')").bind(id,status,actor,id),
-        env.DB.prepare("UPDATE reports SET status=?, reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND status='pending'").bind(status,id)
+        env.DB.prepare("UPDATE reports SET location_label=?, description=?, status=?, reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND status='pending'").bind(location,description,status,id)
       ]);
       if(!results[1]?.meta?.changes)return json({error:"Report not found or already reviewed."},404);
       return json({ok:true,id,status});
