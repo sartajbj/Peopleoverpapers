@@ -29,3 +29,7 @@
 .notice-box a{color:var(--rust);font-weight:700;font-size:13px}
 .resource-hero{padding-top:70px;padding-bottom:70px}
 @media(max-width:760px){.directory-grid{grid-template-columns:1fr}.resource-directory{padding-top:50px;padding-bottom:50px}}
+
+.moderation-card label{display:block;margin:12px 0;font-size:12px;font-weight:700;color:var(--deep)}
+.moderation-card input,.moderation-card textarea{display:block;width:100%;margin-top:6px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#fffefa;color:var(--ink);font:13px/1.5 "DM Sans",Arial,sans-serif}
+.moderation-card textarea{resize:vertical}
