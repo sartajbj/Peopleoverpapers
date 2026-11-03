@@ -81,18 +81,40 @@
   $("pickLocation").addEventListener("click",()=>{pickingLocation=true;dialog.close();status("Tap an approximate area on the map to select it.");map.getContainer().style.cursor="crosshair";});
   map.on("click",()=>{if(!pickingLocation)map.getContainer().style.cursor="";});
   $("closeReport").addEventListener("click",close); $("cancelReport").addEventListener("click",close);
+  async function prepareResourcePhoto(file){
+    if(!file) return null;
+    if(!/^image\\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Please choose a JPG, PNG or WebP image.");
+    if(file.size>5*1024*1024) throw new Error("Choose an image smaller than 5 MB.");
+    const bitmap=await createImageBitmap(file);
+    const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+    const ctx=canvas.getContext("2d");ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.82));
+    if(!blob) throw new Error("This image could not be prepared. Please choose another.");
+    if(blob.size>2*1024*1024) throw new Error("After image preparation, the photo must be under 2 MB.");
+    return new File([blob],"community-resource.jpg",{type:"image/jpeg"});
+  }
+  $("reportPhoto")?.addEventListener("change",()=>{
+    const f=$("reportPhoto").files?.[0];
+    $("photoStatus").textContent=f?f.name+" selected. It will be resized and metadata removed before upload.":"No photo selected.";
+  });
   form.addEventListener("submit",async e=>{
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
     if(!form.reportValidity())return; if(!form.lat.value||!form.lng.value){alert.textContent="Please choose an approximate area on the map first.";return;}
     const data=Object.fromEntries(new FormData(form).entries());
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
-    const payload={category:data.category,city:data.city,state:data.state,lat:Number(data.lat),lng:Number(data.lng),observedAt:data.observedAt,observedTime:data.observedTime||"",description:data.description,website:data.website||""};
-    btn.disabled=true; alert.className="form-alert"; alert.textContent="Sending securely for review…";
+    btn.disabled=true; alert.className="form-alert"; alert.textContent="Preparing your submission for manual review…";
     try{
-      const res=await fetch("/api/reports",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(payload)});
+      const photo=await prepareResourcePhoto(data.photo && data.photo.size?data.photo:null);
+      const payload=new FormData();
+      for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website"]) payload.append(key,String(data[key]||""));
+      if(photo) payload.append("photo",photo,"community-resource.jpg");
+      const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
       const body=await res.json(); if(!res.ok)throw new Error(body.error||"Submission could not be accepted.");
-      alert.textContent="Thank you. Your report was received for moderation. It will not appear publicly until approved and delayed.";
-      form.reset(); setTimeout(()=>{dialog.close();alert.textContent="";},2800);
+      alert.textContent="Thank you. Your report and optional resource photo are pending manual review. Nothing is public until approved and delayed.";
+      form.reset(); $("photoStatus").textContent="No photo selected.";
+      setTimeout(()=>{dialog.close();alert.textContent="";},3200);
     }catch(err){alert.className="form-alert error";alert.textContent=err.message||"Network error. Please try again.";}
     finally{btn.disabled=false;}
   });
