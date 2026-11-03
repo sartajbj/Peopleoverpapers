@@ -4,14 +4,17 @@ export async function onRequest({request,env}) {
  if(!env.DB||!env.MODERATION_TOKEN)return json({error:"Moderation service is not configured."},503);
  if(!authorized(request,env))return json({error:"Unauthorized."},401);
  if(request.method==="GET"){
-  const {results=[]}=await env.DB.prepare("SELECT id,category,city,state,description,observed_date,observed_time,submitted_at FROM reports WHERE status='pending' ORDER BY submitted_at ASC LIMIT 100").all();
-  return json({reports:results});
+  const {results=[]}=await env.DB.prepare("SELECT id,category,city,state,description,observed_date,observed_time,submitted_at,photo_key FROM reports WHERE status='pending' ORDER BY submitted_at ASC LIMIT 100").all();
+  return json({reports:results.map(({photo_key,...r})=>({...r,has_photo:!!photo_key}))});
  }
  if(request.method==="PATCH"){
   let body;try{body=await request.json();}catch{return json({error:"Invalid JSON."},400);}
   if(!body.id||!["approved","rejected"].includes(body.status))return json({error:"A report ID and approved/rejected status are required."},400);
+  const row=await env.DB.prepare("SELECT photo_key FROM reports WHERE id=? AND status='pending'").bind(String(body.id)).first();
+  if(!row)return json({error:"Pending report not found."},404);
   const result=await env.DB.prepare("UPDATE reports SET status=? WHERE id=? AND status='pending'").bind(body.status,String(body.id)).run();
   if(!result.meta?.changes)return json({error:"Pending report not found."},404);
+  if(body.status==="rejected" && row.photo_key && env.REPORT_PHOTOS) await env.REPORT_PHOTOS.delete(row.photo_key).catch(()=>{});
   return json({updated:true});
  }
  return json({error:"Method not allowed."},405);
