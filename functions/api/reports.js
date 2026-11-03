@@ -12,6 +12,8 @@ export async function onRequestGet({env}) {
 }
 export async function onRequestPost({request,env}) {
  if(!env.DB) return json({error:"Report service is not configured yet."},503);
+ const contentLength=Number(request.headers.get("content-length")||0);
+ if(contentLength>3*1024*1024) return json({error:"Submission is too large. The optional photo must be no larger than 2 MB."},413);
  const origin=request.headers.get("origin");
  if(origin && origin!==new URL(request.url).origin) return json({error:"Cross-site submission blocked."},403);
  let form;try{form=await request.formData();}catch{return json({error:"Invalid form submission."},400);}
