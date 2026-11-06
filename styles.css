@@ -480,3 +480,21 @@ body{background:#fffdf9}
     text-wrap:balance;
   }
 }
+
+
+/* Tablet and desktop balance: prevent the hero card and section CTA from becoming narrow */
+@media(min-width:701px) and (max-width:1000px){
+  .guide-hero{
+    grid-template-columns:minmax(0,1.15fr) minmax(260px,.85fr);
+    gap:clamp(24px,4vw,42px);
+    padding-left:clamp(28px,6vw,64px);
+    padding-right:clamp(28px,6vw,64px);
+  }
+  .guide-hero .hero-card{width:100%;max-width:none;padding:28px}
+  .guide-hero .hero-card h2{font-size:clamp(23px,2.8vw,29px)}
+  .map-section .section-heading{align-items:center}
+  .map-section .section-heading>.button{white-space:nowrap;flex:0 0 auto}
+}
+@media(min-width:1001px){
+  .map-section .section-heading>.button{white-space:nowrap}
+}
