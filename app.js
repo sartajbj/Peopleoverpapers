@@ -72,7 +72,7 @@
           </div>
           <button class="report-map-jump" type="button">View area on map</button>
         </div>
-        <div class="feed-map-wrap"><div class="feed-map-preview" data-lat="${lat}" data-lng="${lng}" role="img" aria-label="Approximate map preview for ${location}"></div><small class="map-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></small></div>
+        <div class="feed-map-wrap"><div class="feed-map-preview" data-lat="${lat}" data-lng="${lng}" role="img" aria-label="Approximate map preview for ${location}"></div><small class="map-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></small></div>
       </article>`;
     }).join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
     $("reportFeed").querySelectorAll(".report-map-jump").forEach(b=>b.addEventListener("click",()=>{
