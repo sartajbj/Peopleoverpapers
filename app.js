@@ -72,7 +72,7 @@
           </div>
           <button class="report-map-jump" type="button">View area on map</button>
         </div>
-        <div class="feed-map-preview" data-lat="${lat}" data-lng="${lng}" role="img" aria-label="Approximate map preview for ${location}"></div>
+        <div class="feed-map-wrap"><div class="feed-map-preview" data-lat="${lat}" data-lng="${lng}" role="img" aria-label="Approximate map preview for ${location}"></div><small class="map-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></small></div>
       </article>`;
     }).join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
     $("reportFeed").querySelectorAll(".report-map-jump").forEach(b=>b.addEventListener("click",()=>{
@@ -83,7 +83,7 @@
     $("reportFeed").querySelectorAll(".feed-map-preview").forEach(el=>{
       const lat=Number(el.dataset.lat),lng=Number(el.dataset.lng);
       if(!Number.isFinite(lat)||!Number.isFinite(lng))return;
-      const preview=L.map(el,{zoomControl:false,attributionControl:true,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false});
+      const preview=L.map(el,{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false});
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'}).addTo(preview);
       L.circleMarker([lat,lng],{radius:7,color:"#fff",weight:2,fillColor:"#c94d38",fillOpacity:1}).addTo(preview);
       preview.setView([lat,lng],11);
