@@ -458,3 +458,25 @@ body{background:#fffdf9}
   .guide-hero h1{font-size:clamp(50px,14vw,62px)}
   .guide-steps article{padding:17px}
 }
+
+
+/* Keep long homepage headings readable on narrow screens */
+@media(max-width:700px){
+  .about-inner h2{
+    font-size:clamp(30px,8vw,40px);
+    line-height:1.12;
+    letter-spacing:-.035em;
+    max-width:100%;
+    text-wrap:balance;
+  }
+  .about-inner>p:not(.eyebrow){
+    max-width:620px;
+    font-size:15px;
+    line-height:1.65;
+  }
+  .info-grid h2,
+  .section-heading h2,
+  .support-panel h2{
+    text-wrap:balance;
+  }
+}
