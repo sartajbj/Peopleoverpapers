@@ -406,3 +406,30 @@ body{background:#fffdf9}
   line-height:1.2;
   letter-spacing:-.01em;
 }
+
+/* Keep full required OSM credit inside the thumbnail column */
+.feed-map-wrap{
+  width:116px;
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+}
+.map-attribution{
+  display:block;
+  width:100%;
+  max-width:100%;
+  margin:3px 0 0;
+  padding:0 2px;
+  box-sizing:border-box;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-align:right;
+  font-size:7px;
+  line-height:1.15;
+}
+.map-attribution a{
+  display:inline;
+  overflow-wrap:anywhere;
+}
+@media(max-width:700px){.feed-map-wrap{width:104px}}
+@media(max-width:390px){.feed-map-wrap{width:88px}}
