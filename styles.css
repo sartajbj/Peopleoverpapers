@@ -433,3 +433,28 @@ body{background:#fffdf9}
 }
 @media(max-width:700px){.feed-map-wrap{width:104px}}
 @media(max-width:390px){.feed-map-wrap{width:88px}}
+
+
+/* Mobile spacing polish: tighten oversized section gaps without crowding content */
+@media(max-width:700px){
+  .guide-hero{padding:36px 22px 34px;min-height:0}
+  .guide-hero .eyebrow{margin-bottom:9px}
+  .guide-hero .hero-lede{margin:18px 0 20px;line-height:1.55}
+  .guide-hero .hero-actions{gap:13px}
+  .resources-section{padding:46px 0 50px}
+  .resources-section .section-heading{margin-bottom:20px}
+  .guide-steps{gap:14px}
+  .guide-steps article{padding:19px}
+  .info-section{padding:46px 0}
+  .info-grid{gap:22px}
+  .info-grid h2{font-size:clamp(36px,10vw,48px);line-height:1.08}
+  .info-grid>div:nth-child(2){font-size:14px;line-height:1.6}
+  .resource-directory{padding-top:48px;padding-bottom:50px}
+  .resource-directory .section-heading{margin-bottom:20px}
+  .faq-section{padding-top:48px;padding-bottom:52px}
+}
+@media(max-width:390px){
+  .guide-hero{padding-left:18px;padding-right:18px}
+  .guide-hero h1{font-size:clamp(50px,14vw,62px)}
+  .guide-steps article{padding:17px}
+}
