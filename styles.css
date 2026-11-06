@@ -330,3 +330,26 @@ body{background:#fffdf9}
   .report-card-location{font-size:14px}
   .reviewed-label{align-items:flex-start}
 }
+
+
+/* Final mobile-first report feed layout */
+.feed-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.feed-heading h3{font-size:clamp(17px,4.6vw,22px);line-height:1.2;max-width:none;white-space:nowrap}
+.feed-heading span{white-space:nowrap;flex:none;font-size:11px;padding:6px 10px}
+.report-feed-item{grid-template-columns:minmax(0,1fr) 116px;gap:14px}
+.report-card-top time{width:auto;margin-left:auto}
+.feed-map-preview{width:116px;height:116px;min-height:116px;aspect-ratio:1/1;align-self:center}
+.report-map-jump{white-space:normal}
+@media(max-width:700px){
+ .feed-heading h3{font-size:18px;white-space:normal}
+ .feed-heading span{font-size:10px;padding:5px 8px}
+ .report-feed-item{grid-template-columns:minmax(0,1fr) 104px;gap:10px;padding:12px}
+ .feed-map-preview{width:104px;height:104px;min-height:104px}
+ .report-card-top time{width:auto;margin-left:0}
+ .report-map-jump{font-size:11px;padding:8px 10px;white-space:normal}
+}
+@media(max-width:390px){
+ .report-feed-item{grid-template-columns:minmax(0,1fr) 88px;gap:8px;padding:10px}
+ .feed-map-preview{width:88px;height:88px;min-height:88px}
+ .feed-heading h3{font-size:17px}
+}
