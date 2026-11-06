@@ -8,6 +8,18 @@
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
     maxZoom:18, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
+  // Official U.S. Census Bureau label overlay: county names appear as users zoom in,
+  // with incorporated-place names at closer city-level zooms. The overlay is transparent,
+  // so the existing OpenStreetMap basemap and report markers remain visible.
+  L.tileLayer.wms("https://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_Current/MapServer/WMSServer",{
+    layers:"83,29",
+    format:"image/png",
+    transparent:true,
+    version:"1.3.0",
+    opacity:0.88,
+    zIndex:350,
+    attribution:'&copy; <a href="https://www.census.gov/">U.S. Census Bureau</a>'
+  }).addTo(map);
   const layer = L.layerGroup().addTo(map);
   let reports = [];
   const status = (message) => { if($("mapStatus")) $("mapStatus").textContent=message; };
