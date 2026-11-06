@@ -36,16 +36,28 @@
     });
     $("reportCount").textContent=shown.length;
     $("feedCount").textContent=shown.length+" shown";
-    $("reportFeed").innerHTML=shown.slice(0,10).map(r=>'<button type="button" class="report-feed-item" data-lat="'+Number(r.lat)+'" data-lng="'+Number(r.lng)+'"><span class="dot '+escapeHtml(r.category)+'"></span><span><b>'+escapeHtml(labels[r.category]||"Community information")+'</b><small>'+escapeHtml(r.city)+", "+escapeHtml(r.state)+'</small><small class="feed-meta">Occurred: '+escapeHtml(r.observed_date||"Date not supplied")+(r.observed_time?" · "+escapeHtml(r.observed_time):"")+"</small><small class=\"feed-meta\">Submitted: "+escapeHtml(r.submitted_at||"Time unavailable")+'</small>'+(r.photo_url?'<img class="feed-photo" src="'+escapeHtml(r.photo_url)+'" alt="Approved community resource photo" loading="lazy">':'')+'<span class="feed-description">'+escapeHtml(r.description)+'</span></span></button>').join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
+    $("reportFeed").innerHTML=shown.slice(0,10).map(r=>'<button type="button" class="report-feed-item" data-lat="'+Number(r.lat)+'" data-lng="'+Number(r.lng)+'"><span class="report-card-main"><span class="report-card-top"><b class="category-pill '+escapeHtml(r.category)+'">'+escapeHtml(labels[r.category]||"Community information")+'</b><span class="reviewed-label">Reviewed</span><time>'+escapeHtml(r.observed_date||"Date not supplied")+'</time></span><strong class="report-card-location">'+escapeHtml(r.city)+", "+escapeHtml(r.state)+", USA</strong><span class="report-card-times"><span>Observed: '+escapeHtml(r.observed_time||"Time not supplied")+'</span><span>Submitted: '+escapeHtml(r.submitted_at||"Time unavailable")+'</span></span><span class="feed-description">'+escapeHtml(r.description)+'</span></span>'+(r.photo_url?'<img class="feed-photo" src="'+escapeHtml(r.photo_url)+'" alt="Approved public community resource image" loading="lazy">':'')+'</button>').join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
     $("reportFeed").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{map.setView([Number(b.dataset.lat),Number(b.dataset.lng)],9);}));
+  }
+  async function readApiResponse(res){
+    const type=res.headers.get("content-type")||"";
+    const raw=await res.text();
+    if(!type.includes("application/json")){
+      if(raw.trim().startsWith("<")) throw new Error("The report API returned a web page instead of JSON. The latest Cloudflare Pages Functions deployment or /api route is not active yet.");
+      throw new Error("The report service returned an unexpected response. Please try again later.");
+    }
+    let data;try{data=JSON.parse(raw);}catch{throw new Error("The report service returned invalid data. Please try again later.");}
+    if(!res.ok) throw new Error(data.error||"The report request could not be completed.");
+    return data;
   }
   async function load(){
     status("Loading approved reports…");
     try{
-      const res=await fetch("/api/reports",{headers:{Accept:"application/json"}});
-      if(!res.ok) throw new Error("Reports are temporarily unavailable.");
-      const data=await res.json(); reports=Array.isArray(data.reports)?data.reports:[];
-      render(); status(reports.length ? "Showing reviewed reports. New submissions are delayed at least 24 hours." : "No approved reports yet. Be the first to submit useful, non-identifying information.");
+      const res=await fetch("/api/reports",{headers:{Accept:"application/json"},cache:"no-store"});
+      const data=await readApiResponse(res);
+      reports=Array.isArray(data.reports)?data.reports:[];
+      render();
+      status(reports.length ? "Showing the 10 most recent approved reports. Publication is delayed at least 24 hours." : "No reports are publicly available yet. Approved submissions appear here after the privacy delay.");
     }catch(e){status(e.message||"Unable to load reports. Please try again later.");}
   }
   let pickingLocation=false;
@@ -135,7 +147,7 @@
       for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website","consent"]) payload.append(key,String(data[key]||""));
       if(photo) payload.append("photo",photo,"community-resource.jpg");
       const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
-      const body=await res.json(); if(!res.ok)throw new Error(body.error||"Submission could not be accepted.");
+      const body=await readApiResponse(res);
       alert.textContent="Thank you. Your report and optional resource photo are pending manual review. Nothing is public until approved and delayed.";
       form.reset(); $("photoStatus").textContent="No photo selected.";
       setTimeout(()=>{dialog.close();alert.textContent="";},3200);
