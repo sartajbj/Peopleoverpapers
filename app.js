@@ -4,7 +4,7 @@
   if (!mapEl || !window.L) return;
   const colors = {critical:"#c94d38",active:"#d99b16",observed:"#79a94c",support:"#286b9b"};
   const labels = {critical:"Urgent concern",active:"Community update",observed:"Resource / support",support:"Other"};
-  const map = L.map(mapEl,{scrollWheelZoom:false}).setView([39.2,-98.5],4);
+  const map = L.map(mapEl,{scrollWheelZoom:false,zoomSnap:0.5}).setView([39.2,-98.5],4.5);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
     maxZoom:18, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
@@ -62,7 +62,7 @@
     }
   });
   document.querySelectorAll(".filter-row input").forEach(x=>x.addEventListener("change",render));
-  $("resetMap").addEventListener("click",()=>map.setView([39.2,-98.5],4));
+  $("resetMap").addEventListener("click",()=>{map.setView([39.2,-98.5],4.5);if(searchMarker){map.removeLayer(searchMarker);searchMarker=null;}$("mapSearch").value="";status("Showing the U.S. overview.");});
   let searchMarker=null;
   async function searchPlace(){
     const q=$("mapSearch").value.trim();
