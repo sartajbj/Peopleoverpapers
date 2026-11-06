@@ -5,7 +5,7 @@ function unsafeText(s){return /(?:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|\b\+?\d[
 export async function onRequestGet({env}) {
  if(!env.DB) return json({error:"Report service is not configured yet."},503);
  try{
-  const {results=[]}=await env.DB.prepare("SELECT id,category,city,state,lat,lng,description,observed_date,observed_time,submitted_at FROM reports WHERE status='approved' AND submitted_at <= datetime('now','-24 hours') ORDER BY submitted_at DESC LIMIT 10").all();
+  const {results=[]}=await env.DB.prepare("SELECT id,category,city,state,lat,lng,description,observed_date,observed_time,submitted_at FROM reports WHERE status='approved' ORDER BY submitted_at DESC LIMIT 10").all();
   return json({reports:results});
  }catch{return json({error:"Unable to load reports."},500);}
 }
