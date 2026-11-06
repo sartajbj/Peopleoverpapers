@@ -36,7 +36,7 @@
       marker.addTo(layer);
     });
     $("reportCount").textContent=shown.length;
-    $("feedCount").textContent=shown.length+" shown";
+    $("feedCount").textContent=shown.length+" "+(shown.length===1?"report":"reports");
     miniMaps.forEach(m=>m.remove());
     miniMaps=[];
     $("reportFeed").innerHTML = shown.slice(0, 10).map(r => {
@@ -56,7 +56,7 @@
             <span>Observed: ${escapeHtml(r.observed_time || "Time not supplied")}</span>
             <span>Submitted: ${escapeHtml(r.submitted_at || "Time unavailable")}</span>
           </div>
-          <button class="report-map-jump" type="button">View approximate area on map</button>
+          <button class="report-map-jump" type="button">View area on map</button>
         </div>
         <div class="feed-map-preview" data-lat="${lat}" data-lng="${lng}" role="img" aria-label="Approximate map preview for ${location}"></div>
       </article>`;
@@ -95,7 +95,7 @@
       const data=await readApiResponse(res);
       reports=Array.isArray(data.reports)?data.reports:[];
       render();
-      status(reports.length ? "Showing the 10 most recent approved reports. Publication is delayed at least 24 hours." : "No reports are publicly available yet. Approved submissions appear here after the privacy delay.");
+      status(reports.length ? "Showing the 10 most recent approved reports." : "No reports are publicly available yet. Approved submissions appear here after admin review.");
     }catch(e){status(e.message||"Unable to load reports. Please try again later.");}
   }
   let pickingLocation=false;
@@ -182,9 +182,10 @@
       for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website","consent"]) payload.append(key,String(data[key]||""));
       const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
       await readApiResponse(res);
-      alert.textContent="Thank you. Your report is pending manual review. It will appear publicly only after approval and the 24-hour privacy delay.";
+      alert.textContent="✓ Thank you! Your report has been submitted and is awaiting admin review.";
+      alert.className="form-alert success";
       form.reset();
-      setTimeout(()=>{dialog.close();alert.textContent="";},3200);
+      setTimeout(()=>{dialog.close();alert.textContent="";alert.className="form-alert";if($("official-map"))$("official-map").scrollIntoView({behavior:"smooth",block:"start"});},2000);
     }catch(err){alert.className="form-alert error";alert.textContent=err.message||"Network error. Please try again.";}
     finally{btn.disabled=false;}
   });
