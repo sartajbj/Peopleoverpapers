@@ -22,6 +22,7 @@
   }).addTo(map);
   const layer = L.layerGroup().addTo(map);
   let reports = [];
+  let miniMaps = [];
   const status = (message) => { if($("mapStatus")) $("mapStatus").textContent=message; };
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function visibleCategories(){return [...document.querySelectorAll(".filter-row input:checked")].map(x=>x.value);}
@@ -36,29 +37,45 @@
     });
     $("reportCount").textContent=shown.length;
     $("feedCount").textContent=shown.length+" shown";
+    miniMaps.forEach(m=>m.remove());
+    miniMaps=[];
     $("reportFeed").innerHTML = shown.slice(0, 10).map(r => {
       const category = escapeHtml(r.category);
       const location = [r.city, r.state, "USA"].filter(Boolean).map(escapeHtml).join(", ");
-      const photo = r.photo_url
-        ? `<img class="feed-photo" src="${escapeHtml(r.photo_url)}" alt="Approved community report image" loading="lazy">`
-        : "";
-      return `<button type="button" class="report-feed-item" data-lat="${Number(r.lat)}" data-lng="${Number(r.lng)}">
-        <span class="report-card-main">
-          <span class="report-card-top">
+      const lat=Number(r.lat),lng=Number(r.lng);
+      return `<article class="report-feed-item" data-lat="${lat}" data-lng="${lng}">
+        <div class="report-card-main">
+          <div class="report-card-top">
             <b class="category-pill ${category}">${escapeHtml(labels[r.category] || "Community information")}</b>
-            <span class="reviewed-label">Reviewed</span>
+            <span class="reviewed-label">Reviewed · not independently verified</span>
             <time>${escapeHtml(r.observed_date || "Date not supplied")}</time>
-          </span>
+          </div>
           <strong class="report-card-location">${location}</strong>
-          <span class="report-card-times">
+          <p class="feed-description">${escapeHtml(r.description)}</p>
+          <div class="report-card-times">
             <span>Observed: ${escapeHtml(r.observed_time || "Time not supplied")}</span>
             <span>Submitted: ${escapeHtml(r.submitted_at || "Time unavailable")}</span>
-          </span>
-          <span class="feed-description">${escapeHtml(r.description)}</span>
-        </span>${photo}
-      </button>`;
+          </div>
+          <button class="report-map-jump" type="button">View approximate area on map</button>
+        </div>
+        <div class="feed-map-preview" data-lat="${lat}" data-lng="${lng}" role="img" aria-label="Approximate map preview for ${location}"></div>
+      </article>`;
     }).join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
-    $("reportFeed").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{map.setView([Number(b.dataset.lat),Number(b.dataset.lng)],9);}));
+    $("reportFeed").querySelectorAll(".report-map-jump").forEach(b=>b.addEventListener("click",()=>{
+      const card=b.closest(".report-feed-item");
+      map.setView([Number(card.dataset.lat),Number(card.dataset.lng)],9);
+      $("map").scrollIntoView({behavior:"smooth",block:"center"});
+    }));
+    $("reportFeed").querySelectorAll(".feed-map-preview").forEach(el=>{
+      const lat=Number(el.dataset.lat),lng=Number(el.dataset.lng);
+      if(!Number.isFinite(lat)||!Number.isFinite(lng))return;
+      const preview=L.map(el,{zoomControl:false,attributionControl:true,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false});
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'}).addTo(preview);
+      L.circleMarker([lat,lng],{radius:7,color:"#fff",weight:2,fillColor:"#c94d38",fillOpacity:1}).addTo(preview);
+      preview.setView([lat,lng],11);
+      miniMaps.push(preview);
+      setTimeout(()=>preview.invalidateSize(),80);
+    });
   }
   async function readApiResponse(res){
     const type=res.headers.get("content-type")||"";
@@ -153,45 +170,20 @@
   });
   map.on("click",()=>{if(!pickingLocation)map.getContainer().style.cursor="";});
   $("closeReport").addEventListener("click",close); $("cancelReport").addEventListener("click",close);
-  async function prepareResourcePhoto(file){
-    if(!file) return null;
-    if(!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error("Please choose a JPG, PNG or WebP image.");
-    if(file.size>5*1024*1024) throw new Error("Choose an image smaller than 5 MB.");
-    const bitmap=await createImageBitmap(file);
-    const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));
-    const canvas=document.createElement("canvas");
-    canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
-    const ctx=canvas.getContext("2d");ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
-    const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.82));
-    if(!blob) throw new Error("This image could not be prepared. Please choose another.");
-    if(blob.size>2*1024*1024) throw new Error("After image preparation, the photo must be under 2 MB.");
-    return new File([blob],"community-resource.jpg",{type:"image/jpeg"});
-  }
-  $("reportPhoto")?.addEventListener("change",()=>{
-    const f=$("reportPhoto").files?.[0];
-    $("photoStatus").textContent=f?f.name+" selected. It will be resized and metadata removed before upload.":"No photo selected.";
-  });
   form.addEventListener("submit",async e=>{
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
-    if(!form.reportValidity())return; if(!form.lat.value||!form.lng.value){alert.textContent="Please choose an approximate area on the map first.";return;}
+    if(!form.reportValidity())return;
+    if(!form.lat.value||!form.lng.value){alert.textContent="Please choose an approximate area on the map first.";return;}
     const data=Object.fromEntries(new FormData(form).entries());
-    if(data.photo && data.photo.size){
-      alert.className="form-alert error";
-      alert.textContent="Photo uploads are not enabled yet. Remove the selected photo to submit your report, or try again once photo storage is configured.";
-      $("reportPhoto")?.focus();
-      return;
-    }
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
-    btn.disabled=true; alert.className="form-alert"; alert.textContent="Preparing your submission for manual review…";
+    btn.disabled=true; alert.className="form-alert"; alert.textContent="Sending your report for manual review…";
     try{
-      const photo=await prepareResourcePhoto(data.photo && data.photo.size?data.photo:null);
       const payload=new FormData();
       for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website","consent"]) payload.append(key,String(data[key]||""));
-      if(photo) payload.append("photo",photo,"community-resource.jpg");
       const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
-      const body=await readApiResponse(res);
-      alert.textContent="Thank you. Your report is pending manual review. Nothing is public until approved and delayed.";
-      form.reset(); $("photoStatus").textContent="No photo selected.";
+      await readApiResponse(res);
+      alert.textContent="Thank you. Your report is pending manual review. It will appear publicly only after approval and the 24-hour privacy delay.";
+      form.reset();
       setTimeout(()=>{dialog.close();alert.textContent="";},3200);
     }catch(err){alert.className="form-alert error";alert.textContent=err.message||"Network error. Please try again.";}
     finally{btn.disabled=false;}
