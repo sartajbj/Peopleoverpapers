@@ -20,7 +20,21 @@
     zIndex:350,
     attribution:'&copy; <a href="https://www.census.gov/">U.S. Census Bureau</a>'
   }).addTo(map);
-  const layer = L.layerGroup().addTo(map);
+  const layer = L.markerClusterGroup ? L.markerClusterGroup({
+    showCoverageOnHover:false,
+    spiderfyOnMaxZoom:true,
+    zoomToBoundsOnClick:true,
+    maxClusterRadius:48,
+    iconCreateFunction(cluster){
+      const count=cluster.getChildCount();
+      const size=count<10?"small":count<50?"medium":"large";
+      return L.divIcon({
+        html:"<span>"+count+"</span>",
+        className:"report-marker-cluster report-marker-cluster-"+size,
+        iconSize:L.point(42,42)
+      });
+    }
+  }).addTo(map) : L.layerGroup().addTo(map);
   let reports = [];
   let miniMaps = [];
   const status = (message) => { if($("mapStatus")) $("mapStatus").textContent=message; };
@@ -39,7 +53,7 @@
     $("feedCount").textContent=shown.length+" "+(shown.length===1?"report":"reports");
     miniMaps.forEach(m=>m.remove());
     miniMaps=[];
-    $("reportFeed").innerHTML = shown.slice(0, 10).map(r => {
+    $("reportFeed").innerHTML = shown.slice(0, 20).map(r => {
       const category = escapeHtml(r.category);
       const location = [r.city, r.state, "USA"].filter(Boolean).map(escapeHtml).join(", ");
       const lat=Number(r.lat),lng=Number(r.lng);
@@ -95,7 +109,7 @@
       const data=await readApiResponse(res);
       reports=Array.isArray(data.reports)?data.reports:[];
       render();
-      status(reports.length ? "Showing the 10 most recent approved reports." : "No reports are publicly available yet. Approved submissions appear here after admin review.");
+      status(reports.length ? "Showing up to 20 of the most recent approved reports." : "No reports are publicly available yet. Approved submissions appear here after admin review.");
     }catch(e){status(e.message||"Unable to load reports. Please try again later.");}
   }
   let pickingLocation=false;
