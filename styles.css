@@ -154,3 +154,41 @@ body{background:#fffdf9}
 /* Keep Leaflet zoom controls clear of the map wordmark. */
 .map-frame .leaflet-top.leaflet-left{top:76px}
 @media(max-width:700px){.map-frame .leaflet-top.leaflet-left{top:68px}.map-brand-badge{max-width:calc(100% - 165px)}}
+
+
+/* Submission form: accessible, mobile-first community-report flow */
+.report-dialog{width:min(680px,calc(100% - 24px));max-height:min(92dvh,900px);background:#fffdfa}
+.report-form{padding:clamp(20px,4vw,34px);max-height:min(92dvh,900px);overflow-y:auto;overscroll-behavior:contain}
+.report-form .dialog-heading{position:sticky;top:-1px;z-index:2;align-items:flex-start;gap:15px;padding:0 0 16px;background:#fffdfa;border-bottom:1px solid #eee5dc}
+.report-form .dialog-heading h2{font-size:clamp(25px,5vw,34px);line-height:1.15;max-width:470px}
+.report-step-note{font-size:12px;color:var(--muted);margin:7px 0 0}
+.report-form .close-dialog{flex:none;width:42px;height:42px;background:#f0eee9;font-size:28px}
+.report-safety-note{display:grid;gap:4px;margin:17px 0;padding:14px 16px;border:1px solid #e6d7c9;border-left:4px solid var(--rust);border-radius:12px;background:#faf4eb;font-size:12px;color:#62564f}
+.report-safety-note strong{font:800 13px Manrope;color:var(--deep)}
+.report-location-box{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:15px;border:1px solid #e6ded4;border-radius:13px;background:#f8f6f0}
+.report-location-box>div{min-width:0}.report-location-box strong{font:800 13px Manrope;color:var(--deep)}
+.report-location-box p{font-size:11px;line-height:1.45;color:var(--muted);margin:4px 0 0;overflow-wrap:anywhere}
+.report-location-box .map-pick-button{flex:none;white-space:nowrap}
+.report-form>label,.report-form .form-row label{font-size:13px;color:#42342d;margin:16px 0}
+.report-form input:not([type=checkbox]),.report-form select,.report-form textarea{min-height:47px;border:1px solid #dcd3c9;border-radius:10px;background:#fff;color:#34251e;padding:12px;font-size:14px}
+.report-form textarea{min-height:120px;resize:vertical}
+.report-form input:focus-visible,.report-form select:focus-visible,.report-form textarea:focus-visible,.report-form button:focus-visible{outline:3px solid #8bb9b4;outline-offset:2px}
+.report-form .field-hint{display:inline;color:#7b6e65;line-height:1.5}
+.report-form .photo-upload{display:block;padding:14px!important;border:1px dashed #cfc3b6;border-radius:12px;background:#faf7f1}
+.report-form .photo-upload .field-hint{display:block;margin-top:5px}
+.report-form .photo-upload input[type=file]{border:0;background:transparent;padding:8px 0;min-height:auto}
+.report-form .consent{display:flex!important;align-items:flex-start;gap:10px;padding:13px;border:1px solid #e8dfd4;border-radius:11px;background:#fbf8f2;font-size:12px;line-height:1.5}
+.report-form .consent input{width:18px;height:18px;flex:none;margin:2px 0 0;accent-color:var(--teal)}
+.report-form .dialog-actions{position:sticky;bottom:-1px;background:#fffdfa;padding:14px 0 0;border-top:1px solid #eee5dc}
+.report-form .dialog-actions .button{min-height:46px}
+.report-form .form-alert{padding:0;margin:10px 0;line-height:1.5}
+@media(max-width:600px){
+ .report-dialog{width:calc(100% - 12px);max-height:96dvh;border-radius:18px}
+ .report-form{max-height:96dvh;padding:17px}
+ .report-form .dialog-heading h2{font-size:25px}
+ .report-form .dialog-actions{gap:8px}
+ .report-form .dialog-actions .button{flex:1;padding:12px 10px;font-size:13px}
+ .report-location-box{align-items:flex-start;flex-direction:column}
+ .report-location-box .map-pick-button{width:100%}
+ .report-form .form-row{grid-template-columns:1fr;gap:0}
+}
