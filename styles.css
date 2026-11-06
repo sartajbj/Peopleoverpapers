@@ -124,18 +124,18 @@ body{background:#fffdf9}
 @media(max-width:700px){.report-feed{grid-template-columns:1fr}.report-feed-wrap{padding:16px}}
 
 /* Map legend and wordmark */
-.map-brand-badge{position:absolute;z-index:450;top:14px;left:14px;display:flex;align-items:center;gap:9px;background:#fffaf1ed;padding:9px 13px;border-radius:9px;box-shadow:0 3px 14px #1235;color:#69351f}
-.map-brand-mark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#07545a;color:#fff;font:800 15px Manrope}
-.map-brand-mark span{color:#f1b08a}
-.map-brand-badge b{display:block;font:800 12px/1.2 Manrope;letter-spacing:.04em}
-.map-brand-badge small{display:block;font:700 8px/1.4 "DM Sans";letter-spacing:.12em;color:#07545a}
+.map-brand-badge{position:absolute;z-index:450;top:14px;left:14px;display:inline-flex;align-items:center;background:#fffaf1ed;padding:12px 17px;border-radius:9px;box-shadow:0 3px 14px #1235;color:#69351f;pointer-events:none}
+
+
+.map-wordmark b{display:block;font:900 16px/1.15 Manrope;letter-spacing:.055em;color:#a94f29}.map-wordmark b+b{color:#07545a}.map-wordmark i{font-style:normal;color:#07545a;font-size:13px;vertical-align:2px}
+
 .map-legend{position:absolute;z-index:450;right:14px;top:14px;min-width:185px;padding:13px 16px;background:#ffffffed;border:1px solid #ffffff;border-radius:16px;box-shadow:0 5px 18px #143a3a30;color:#38291f}
 .map-legend h3{font:800 17px Manrope;margin:0 0 7px;color:#38291f}
 .map-legend>div{display:flex;align-items:center;gap:9px;font-size:13px;line-height:1.9}
 .legend-pin{display:inline-block;width:13px;height:13px;border:2px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 1px 3px #3336}
 .legend-pin.critical{background:#c94d38}.legend-pin.active{background:#d99b16}.legend-pin.observed{background:#79a94c}.legend-pin.support{background:#286b9b}
 .report-feed-item small{display:block}.feed-meta{font-size:10px;color:#81736a;margin-top:4px;display:block}
-@media(max-width:700px){.map-brand-badge{top:10px;left:10px;padding:7px 9px}.map-brand-mark{width:30px;height:30px;font-size:12px}.map-brand-badge b{font-size:9px}.map-brand-badge small{font-size:7px}.map-legend{top:10px;right:10px;min-width:145px;padding:9px 11px;border-radius:12px}.map-legend h3{font-size:13px}.map-legend>div{font-size:10px;line-height:1.8}.map-frame,#mapCanvas{min-height:430px}}
+@media(max-width:700px){.map-brand-badge{top:10px;left:10px;padding:8px 11px}.map-wordmark b{font-size:12px}.map-wordmark i{font-size:10px}.map-legend{top:10px;right:10px;min-width:145px;padding:9px 11px;border-radius:12px}.map-legend h3{font-size:13px}.map-legend>div{font-size:10px;line-height:1.8}.map-frame,#mapCanvas{min-height:430px}}
 
 .location-picker{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0 14px;padding:12px;border:1px solid #e5ddd3;border-radius:12px;background:#fbf8f2}.location-picker p{margin:0;font-size:12px;color:#62564f;flex:1;min-width:160px}.location-picker .map-pick-button{margin:0}
 
@@ -150,3 +150,7 @@ body{background:#fffdf9}
 .moderation-photo-wrap{margin:12px 0;padding:12px;background:#f8f5ef;border:1px solid var(--line);border-radius:12px}.moderation-photo{display:block;max-width:min(100%,420px);max-height:360px;object-fit:contain;border-radius:8px;background:#fff}.photo-upload{padding:14px!important;border:1px solid var(--line);border-radius:12px;background:#fbf8f2}.photo-upload input[type=file]{padding:8px!important;background:#fff!important}.photo-upload .field-hint{display:block;line-height:1.5;margin-top:5px}
 
 .feed-photo{display:block;width:min(100%,260px);max-height:180px;object-fit:cover;border-radius:9px;margin:8px 0}.report-feed-item{min-width:0}.report-feed-item>span:last-child{min-width:0}
+
+/* Keep Leaflet zoom controls clear of the map wordmark. */
+.map-frame .leaflet-top.leaflet-left{top:76px}
+@media(max-width:700px){.map-frame .leaflet-top.leaflet-left{top:68px}.map-brand-badge{max-width:calc(100% - 165px)}}
