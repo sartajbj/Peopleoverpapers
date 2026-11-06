@@ -132,7 +132,7 @@
     try{
       const photo=await prepareResourcePhoto(data.photo && data.photo.size?data.photo:null);
       const payload=new FormData();
-      for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website"]) payload.append(key,String(data[key]||""));
+      for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website","consent"]) payload.append(key,String(data[key]||""));
       if(photo) payload.append("photo",photo,"community-resource.jpg");
       const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
       const body=await res.json(); if(!res.ok)throw new Error(body.error||"Submission could not be accepted.");
