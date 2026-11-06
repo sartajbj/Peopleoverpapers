@@ -63,15 +63,27 @@
   });
   document.querySelectorAll(".filter-row input").forEach(x=>x.addEventListener("change",render));
   $("resetMap").addEventListener("click",()=>map.setView([39.2,-98.5],4));
+  let searchMarker=null;
   async function searchPlace(){
-    const q=$("mapSearch").value.trim(); if(!q)return;
-    status("Searching…");
+    const q=$("mapSearch").value.trim();
+    if(!q){status("Enter a U.S. city or state to search.");$("mapSearch").focus();return;}
+    status("Searching for "+q+"…");
     try{
-      const url="https://nominatim.openstreetmap.org/search?format=json&country=United%20States&limit=1&q="+encodeURIComponent(q);
-      const res=await fetch(url,{headers:{Accept:"application/json"}}); const hits=await res.json();
-      if(!hits.length){status("No U.S. place found. Try a city and state.");return;}
-      map.setView([Number(hits[0].lat),Number(hits[0].lon)],10); status("Map centered on "+q+".");
-    }catch{status("Place search is temporarily unavailable.");}
+      const url="https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=us&limit=1&addressdetails=1&q="+encodeURIComponent(q);
+      const res=await fetch(url,{headers:{Accept:"application/json"}});
+      if(!res.ok) throw new Error("The place search service returned an error.");
+      const hits=await res.json();
+      if(!Array.isArray(hits)||!hits.length){status("No U.S. place found. Try a city and state, such as New York, NY.");return;}
+      const lat=Number(hits[0].lat),lng=Number(hits[0].lon);
+      if(!Number.isFinite(lat)||!Number.isFinite(lng)){status("We couldn't read that location. Try a city and state.");return;}
+      map.invalidateSize(true);
+      map.setView([lat,lng],10,{animate:false});
+      if(searchMarker) map.removeLayer(searchMarker);
+      searchMarker=L.circleMarker([lat,lng],{radius:8,color:"#ffffff",weight:3,fillColor:"#07545a",fillOpacity:1}).addTo(map);
+      searchMarker.bindTooltip("Search location",{direction:"top",offset:[0,-8]}).openTooltip();
+      const name=hits[0].display_name ? hits[0].display_name.split(",").slice(0,2).join(",") : q;
+      status("Map centered on "+name+".");
+    }catch(error){status("Place search is temporarily unavailable. Please try again.");}
   }
   $("searchMap").addEventListener("click",searchPlace);
   $("mapSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchPlace();}});
