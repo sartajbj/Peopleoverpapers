@@ -353,3 +353,13 @@ body{background:#fffdf9}
  .feed-map-preview{width:88px;height:88px;min-height:88px}
  .feed-heading h3{font-size:17px}
 }
+
+/* Numbered report clusters for a clearer national map */
+.report-marker-cluster{background:rgba(7,84,90,.18);border-radius:50%;display:grid;place-items:center}
+.report-marker-cluster span{
+ display:grid;place-items:center;width:32px;height:32px;border:3px solid #fff;
+ border-radius:50%;background:#07545a;color:#fff;font:800 12px Manrope;
+ box-shadow:0 2px 9px rgba(0,0,0,.25)
+}
+.report-marker-cluster-medium span{background:#b96a28}
+.report-marker-cluster-large span{background:#ad432f}
