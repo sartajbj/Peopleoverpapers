@@ -244,3 +244,89 @@ body{background:#fffdf9}
  .report-card-location{font-size:14px}
 }
 @media(max-width:380px){.feed-map-preview{flex-basis:88px;width:88px;min-height:96px}.report-feed-item{gap:8px;padding:9px}}
+
+
+/* Final report-feed polish: balanced cards and landscape map thumbnails */
+.report-feed-wrap{
+  border-radius:20px;
+  padding:clamp(16px,2.4vw,26px);
+  background:#fff;
+  box-shadow:0 10px 30px rgba(4,63,69,.055);
+}
+.feed-heading{margin-bottom:8px;padding-bottom:15px}
+.feed-heading h3{font-size:clamp(20px,2.5vw,24px);letter-spacing:-.025em}
+.feed-heading span{
+  padding:5px 10px;border-radius:999px;
+  background:#edf4f1;color:#315f55;font-weight:700;
+}
+.report-feed{gap:12px}
+.report-feed-item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 176px;
+  align-items:stretch;gap:18px;
+  padding:17px;border:1px solid #e8e2da;border-radius:16px;
+  background:#fff;transition:border-color .18s ease,box-shadow .18s ease;
+}
+.report-feed-item:last-child{border-bottom:1px solid #e8e2da}
+.report-feed-item:hover{
+  border-color:#b8cec7;box-shadow:0 8px 22px rgba(4,63,69,.07);
+  background:#fff;
+}
+.report-card-main{gap:10px;min-width:0}
+.report-card-top{gap:8px 10px;align-items:center}
+.category-pill{padding:7px 11px;border-radius:8px;font-size:12px}
+.reviewed-label{
+  display:inline-flex;align-items:center;gap:5px;
+  color:#286b4c;font-size:11px;line-height:1.35;font-weight:700;
+}
+.reviewed-label:before{width:17px;height:17px;flex:none;margin:0}
+.report-card-top time{
+  width:100%;margin:0;color:#81766e;font-size:12px;
+}
+.report-card-location{
+  font-size:clamp(16px,2vw,19px);line-height:1.35;
+  letter-spacing:-.02em;overflow-wrap:anywhere;
+}
+.feed-description{
+  margin:0;color:#625850;font-size:13px;line-height:1.6;
+}
+.report-card-times{
+  display:flex;flex-wrap:wrap;gap:5px 14px;
+  color:#7a7068;font-size:11px;line-height:1.45;
+}
+.feed-map-preview{
+  width:100%;min-width:0;min-height:0;height:132px;
+  aspect-ratio:4/3;align-self:center;flex:auto;
+  border:1px solid #dce6e1;border-radius:12px;
+  background:#edf2ed;
+}
+.feed-map-preview .leaflet-control-attribution{font-size:8px}
+.report-map-jump{
+  min-height:38px;padding:9px 13px;border-radius:9px;
+  background:#eaf2ef;font-size:12px;font-weight:700;
+  transition:background .18s ease,transform .18s ease;
+}
+.report-map-jump:hover{background:#dcebe5;transform:translateY(-1px)}
+.report-map-jump:focus-visible{outline:3px solid #8bb9b4;outline-offset:2px}
+@media(max-width:700px){
+  .report-feed-wrap{padding:15px;border-radius:16px}
+  .report-feed-item{
+    grid-template-columns:minmax(0,1fr) 112px;
+    gap:12px;padding:13px;border-radius:14px;
+  }
+  .report-card-top{gap:7px}
+  .category-pill{font-size:11px;padding:7px 9px}
+  .reviewed-label{font-size:10px}
+  .report-card-top time{font-size:11px}
+  .report-card-location{font-size:15px}
+  .feed-description{font-size:12px;line-height:1.5}
+  .report-card-times{display:grid;gap:4px;font-size:10px}
+  .feed-map-preview{height:112px;aspect-ratio:1/1}
+  .report-map-jump{font-size:11px;padding:8px 10px;line-height:1.3;text-align:left}
+}
+@media(max-width:390px){
+  .report-feed-item{grid-template-columns:minmax(0,1fr) 94px;gap:9px;padding:10px}
+  .feed-map-preview{height:94px}
+  .report-card-location{font-size:14px}
+  .reviewed-label{align-items:flex-start}
+}
