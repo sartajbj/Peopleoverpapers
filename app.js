@@ -36,7 +36,28 @@
     });
     $("reportCount").textContent=shown.length;
     $("feedCount").textContent=shown.length+" shown";
-    $("reportFeed").innerHTML=shown.slice(0,10).map(r=>'<button type="button" class="report-feed-item" data-lat="'+Number(r.lat)+'" data-lng="'+Number(r.lng)+'"><span class="report-card-main"><span class="report-card-top"><b class="category-pill '+escapeHtml(r.category)+'">'+escapeHtml(labels[r.category]||"Community information")+'</b><span class="reviewed-label">Reviewed</span><time>'+escapeHtml(r.observed_date||"Date not supplied")+'</time></span><strong class="report-card-location">'+escapeHtml(r.city)+", "+escapeHtml(r.state)+", USA</strong><span class="report-card-times"><span>Observed: '+escapeHtml(r.observed_time||"Time not supplied")+'</span><span>Submitted: '+escapeHtml(r.submitted_at||"Time unavailable")+'</span></span><span class="feed-description">'+escapeHtml(r.description)+'</span></span>'+(r.photo_url?'<img class="feed-photo" src="'+escapeHtml(r.photo_url)+'" alt="Approved public community resource image" loading="lazy">':'')+'</button>').join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
+    $("reportFeed").innerHTML = shown.slice(0, 10).map(r => {
+      const category = escapeHtml(r.category);
+      const location = [r.city, r.state, "USA"].filter(Boolean).map(escapeHtml).join(", ");
+      const photo = r.photo_url
+        ? `<img class="feed-photo" src="${escapeHtml(r.photo_url)}" alt="Approved community report image" loading="lazy">`
+        : "";
+      return `<button type="button" class="report-feed-item" data-lat="${Number(r.lat)}" data-lng="${Number(r.lng)}">
+        <span class="report-card-main">
+          <span class="report-card-top">
+            <b class="category-pill ${category}">${escapeHtml(labels[r.category] || "Community information")}</b>
+            <span class="reviewed-label">Reviewed</span>
+            <time>${escapeHtml(r.observed_date || "Date not supplied")}</time>
+          </span>
+          <strong class="report-card-location">${location}</strong>
+          <span class="report-card-times">
+            <span>Observed: ${escapeHtml(r.observed_time || "Time not supplied")}</span>
+            <span>Submitted: ${escapeHtml(r.submitted_at || "Time unavailable")}</span>
+          </span>
+          <span class="feed-description">${escapeHtml(r.description)}</span>
+        </span>${photo}
+      </button>`;
+    }).join("") || '<p class="sidebar-intro">No reviewed reports in the selected categories yet.</p>';
     $("reportFeed").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{map.setView([Number(b.dataset.lat),Number(b.dataset.lng)],9);}));
   }
   async function readApiResponse(res){
