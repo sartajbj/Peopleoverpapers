@@ -393,3 +393,16 @@ body{background:#fffdf9}
 }
 .map-attribution a:hover,
 .map-attribution a:focus-visible{text-decoration:underline}
+
+/* Keep required OSM credit compact on one line */
+.map-attribution{
+  display:block;
+  width:max-content;
+  max-width:none;
+  margin:4px 0 0 auto;
+  white-space:nowrap;
+  text-align:right;
+  font-size:7px;
+  line-height:1.2;
+  letter-spacing:-.01em;
+}
