@@ -82,12 +82,20 @@
     }catch(e){status(e.message||"Unable to load reports. Please try again later.");}
   }
   let pickingLocation=false;
+  const pickerHint=document.createElement("div");
+  pickerHint.id="mapPickerHint";
+  pickerHint.setAttribute("role","status");
+  pickerHint.style.cssText="display:none;position:absolute;z-index:900;left:12px;right:12px;bottom:32px;padding:14px 16px;background:#fffdfa;color:#07545a;border:2px solid #07545a;border-radius:12px;box-shadow:0 5px 22px #0003;font-weight:700;text-align:center";
+  pickerHint.textContent="Tap the map to select an approximate area for your report.";
+  $("map").appendChild(pickerHint);
+  function stopPicking(){pickingLocation=false;pickerHint.style.display="none";map.getContainer().style.cursor="";}
+
   map.on("click",async e=>{
     if(!pickingLocation) return;
     if(e.latlng.lat<24||e.latlng.lat>50||e.latlng.lng< -125||e.latlng.lng> -66){status("Choose an approximate location within the United States.");return;}
     const lat=Number(e.latlng.lat.toFixed(1)),lng=Number(e.latlng.lng.toFixed(1));
     $("reportLat").value=lat.toFixed(1); $("reportLng").value=lng.toFixed(1);
-    pickingLocation=false; map.getContainer().style.cursor="";
+    stopPicking();
     if($("locationStatus")) $("locationStatus").textContent="Approximate area selected. Looking up city and state…";
     dialog.showModal();
     $("formAlert").textContent="Approximate area selected. Only a generalized area is saved.";
@@ -135,7 +143,14 @@
   const dialog=$("reportDialog"),form=$("reportForm");
   function close(){dialog.close();form.reset();$("formAlert").textContent="";if($("locationStatus"))$("locationStatus").textContent="No location selected yet.";}
   $("openReport").addEventListener("click",()=>dialog.showModal());
-  $("pickLocation").addEventListener("click",()=>{pickingLocation=true;dialog.close();status("Tap an approximate area on the map to select it.");map.getContainer().style.cursor="crosshair";});
+  $("pickLocation").addEventListener("click",()=>{
+    pickingLocation=true;
+    dialog.close();
+    pickerHint.style.display="block";
+    status("Tap an approximate area on the map to select it.");
+    $("map").scrollIntoView({behavior:"smooth",block:"center"});
+    setTimeout(()=>{map.invalidateSize(true);map.getContainer().style.cursor="crosshair";},350);
+  });
   map.on("click",()=>{if(!pickingLocation)map.getContainer().style.cursor="";});
   $("closeReport").addEventListener("click",close); $("cancelReport").addEventListener("click",close);
   async function prepareResourcePhoto(file){
@@ -160,6 +175,12 @@
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
     if(!form.reportValidity())return; if(!form.lat.value||!form.lng.value){alert.textContent="Please choose an approximate area on the map first.";return;}
     const data=Object.fromEntries(new FormData(form).entries());
+    if(data.photo && data.photo.size){
+      alert.className="form-alert error";
+      alert.textContent="Photo uploads are not enabled yet. Remove the selected photo to submit your report, or try again once photo storage is configured.";
+      $("reportPhoto")?.focus();
+      return;
+    }
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
     btn.disabled=true; alert.className="form-alert"; alert.textContent="Preparing your submission for manual review…";
     try{
@@ -169,7 +190,7 @@
       if(photo) payload.append("photo",photo,"community-resource.jpg");
       const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
       const body=await readApiResponse(res);
-      alert.textContent="Thank you. Your report and optional resource photo are pending manual review. Nothing is public until approved and delayed.";
+      alert.textContent="Thank you. Your report is pending manual review. Nothing is public until approved and delayed.";
       form.reset(); $("photoStatus").textContent="No photo selected.";
       setTimeout(()=>{dialog.close();alert.textContent="";},3200);
     }catch(err){alert.className="form-alert error";alert.textContent=err.message||"Network error. Please try again.";}
