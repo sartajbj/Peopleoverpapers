@@ -377,3 +377,19 @@ body{background:#fffdf9}
  .feed-map-wrap{width:88px}
  .feed-map-wrap .feed-map-preview{height:88px;min-height:88px}
 }
+
+/* Quiet, readable map-credit label under each thumbnail */
+.map-attribution{
+  margin-top:4px;
+  color:#827b73;
+  font-size:9px;
+  line-height:1.25;
+  letter-spacing:0;
+  opacity:.9;
+}
+.map-attribution a{
+  color:#55736d;
+  text-decoration:none;
+}
+.map-attribution a:hover,
+.map-attribution a:focus-visible{text-decoration:underline}
