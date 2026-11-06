@@ -113,7 +113,7 @@ body{background:#fffdf9}
 .feed-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .feed-heading h3{font:800 19px Manrope;color:var(--deep);margin:0}
 .feed-heading span{font-size:11px;color:var(--muted)}
-.report-feed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.report-feed{display:grid;grid-template-columns:1fr;gap:12px}
 .report-feed-item{display:flex;gap:12px;align-items:flex-start;text-align:left;background:white;border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;color:var(--ink)}
 .report-feed-item:hover{border-color:var(--rust);box-shadow:0 5px 15px #193c3510}
 .report-feed-item .dot{margin-top:5px}
@@ -222,7 +222,7 @@ body{background:#fffdf9}
 
 
 /* Free approximate map previews on report cards */
-.report-feed-item{display:flex;gap:14px;align-items:stretch;text-align:left;background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;color:var(--ink);min-width:0;box-shadow:0 3px 12px #193c3508}
+.report-feed-item{display:flex;gap:14px;align-items:stretch;text-align:left;background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;color:var(--ink);min-width:0;cursor:default;box-shadow:0 3px 12px #193c3508}
 .report-feed-item:hover{border-color:#9bbcb5;box-shadow:0 7px 20px #193c3512}
 .report-card-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:10px}
 .report-card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
