@@ -16,6 +16,7 @@ jobs:
         run: |
           node --check site.js
           node --check app.js
+          node --check admin.js
           node --check functions/api/reports.js
           node --check functions/api/admin/reports.js
           node --check functions/api/report-photo/[id].js
@@ -46,3 +47,5 @@ jobs:
           grep -q 'id="reportForm"' index.html
           grep -q 'FROM reports' functions/api/reports.js
           grep -q 'MODERATION_TOKEN' functions/api/admin/reports.js
+          grep -q 'feed-map-preview' app.js
+          grep -q 'report-map-jump' app.js
