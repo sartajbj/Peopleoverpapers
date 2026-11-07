@@ -31,7 +31,7 @@
    </article>`).join("");
   for(const img of items.querySelectorAll("img[data-photo-id]")){
    try{const response=await fetch("/api/admin/report-photo/"+encodeURIComponent(img.dataset.photoId),{headers:{Authorization:"Bearer "+token}});if(!response.ok)throw new Error("Photo preview unavailable (HTTP "+response.status+").");const type=response.headers.get("content-type")||"";if(!type.startsWith("image/webp"))throw new Error("Photo preview returned an invalid image type.");const blob=await response.blob();if(!blob.size)throw new Error("Photo preview is empty.");const objectUrl=URL.createObjectURL(blob);img.onload=()=>URL.revokeObjectURL(objectUrl);img.onerror=()=>{URL.revokeObjectURL(objectUrl);img.replaceWith(Object.assign(document.createElement("p"),{className:"moderation-meta",textContent:"Photo file could not be displayed. Do not approve until reviewed."}));};img.src=objectUrl;}
-   catch{img.alt="Photo preview unavailable";img.replaceWith(Object.assign(document.createElement("p"),{className:"moderation-meta",textContent:"Photo preview unavailable. Do not approve until reviewed."}));}
+   catch(error){img.alt="Photo preview unavailable";img.replaceWith(Object.assign(document.createElement("p"),{className:"moderation-meta",textContent:"Photo preview failed: "+(error.message||"unknown error")+". Do not approve until reviewed."}));}
   }
   items.querySelectorAll(".moderation-actions button").forEach(button=>button.addEventListener("click",async()=>{
    const card=button.closest("[data-id]");
