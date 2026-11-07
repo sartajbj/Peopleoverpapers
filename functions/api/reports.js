@@ -20,10 +20,14 @@ export async function onRequestPost({request,env}) {
  if(origin && origin!==new URL(request.url).origin) return json({error:"Cross-site submission blocked."},403);
  let form;try{form=await request.formData();}catch{return json({error:"Invalid form submission."},400);}
  if(form.get("website")) return json({received:true},202);
- const category=clean(form.get("category"),20),city=clean(form.get("city"),80),state=clean(form.get("state"),2).toUpperCase();
+ const category=clean(form.get("category"),20);
+ const enteredLocation=clean(form.get("city"),80);
+ const locationMatch=enteredLocation.match(/^(.+?)(?:,\\s*|\\s+)([A-Za-z]{2})$/);
+ const city=clean(locationMatch?locationMatch[1]:enteredLocation,60);
+ const state=locationMatch?locationMatch[2].toUpperCase():"";
  const lat=Number(form.get("lat")),lng=Number(form.get("lng")),description=clean(form.get("description"),500),date=clean(form.get("observedAt"),10),time=clean(form.get("observedTime"),5);
  if(form.get("consent")!=="on") return json({error:"Please confirm the privacy and review conditions before submitting."},400);
- if(!ALLOWED.has(category)||!/^[A-Za-z][A-Za-z .'-]{1,59}$/.test(city)||unsafeText(city)||/[0-9,#]/.test(city)||!/^[A-Z]{2}$/.test(state)||!Number.isFinite(lat)||!Number.isFinite(lng)||lat<24||lat>50||lng< -125||lng> -66) return json({error:"Please provide a valid U.S. category, city, state and approximate map location."},400);
+ if(!ALLOWED.has(category)||!/^[A-Za-z][A-Za-z .'-]{1,59}$/.test(city)||unsafeText(city)||/[0-9,#]/.test(city)||!(state===""||/^[A-Z]{2}$/.test(state))||!Number.isFinite(lat)||!Number.isFinite(lng)||lat<24||lat>50||lng< -125||lng> -66) return json({error:"Please provide a valid U.S. category, city or location, and approximate U.S. map location."},400);
  if(description.length<20||unsafeText(description)) return json({error:"Please provide at least 20 characters and remove phone numbers, email addresses, street addresses and identifying details."},400);
  if((time && !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time))||!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(Date.parse(date))||date>new Date().toISOString().slice(0,10)) return json({error:"Please choose a valid date and time that are not in the future."},400);
  const photo=form.get("photo");let photoBytes=null;
