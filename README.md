@@ -73,12 +73,7 @@ Open Pages → **Custom domains** → **Set up a custom domain** → add `people
 - `GET /api/admin/report-photo/:id`: serves a pending photo to an authenticated moderator.
 - `GET /api/report-photo/:id`: serves an approved photo only after the 24-hour delay.
 
-## SEO
-- Canonical homepage: https://peopleoverpapersmap.com/
-- Sitemap: https://peopleoverpapersmap.com/sitemap.xml
-- Robots: https://peopleoverpapersmap.com/robots.txt
-- Submit the sitemap in Google Search Console after the domain is live and verified.
-- Ranking is not guaranteed; prioritize useful original content, technical quality and visitor safety.
+
 
 ## Contact
 For corrections, privacy questions or feedback: **peopleoverpapersmap@gmail.com**.
