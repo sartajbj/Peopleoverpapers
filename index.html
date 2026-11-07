@@ -57,7 +57,12 @@
    <label>Description <span class="field-hint">20–500 characters. Share general context only.</span>
     <textarea name="description" rows="4" minlength="20" maxlength="500" required placeholder="Describe the community information without identifying anyone."></textarea>
    </label>
-   <div class="report-safety-note"><strong>No photo needed</strong><span>Reports are displayed with an automatic approximate map preview. Photo uploads are disabled to keep submissions free and protect privacy.</span></div>
+   <div class="report-safety-note"><strong>Optional photo · reviewed before publication</strong><span>You may attach one public resource notice, legal-help flyer or community information sign. Do not upload people, faces, vehicles, license plates, private documents, addresses or identifying details. Photos are resized and metadata is removed in your browser; images stay private until moderator approval.</span></div>
+   <label class="photo-upload">Optional photo <span class="field-hint">JPG, PNG or WebP · compressed to WebP · target 50 KB, maximum 100 KB.</span>
+    <input id="reportPhoto" name="photo" type="file" accept="image/jpeg,image/png,image/webp">
+    <span id="photoStatus" class="field-hint" role="status" aria-live="polite">No photo selected. Your report can be submitted without one.</span>
+    <img id="photoPreview" class="photo-preview" alt="Preview of your selected community resource photo" hidden>
+   </label>
    <label class="website-trap" aria-hidden="true">Leave this field empty<input name="website" tabindex="-1" autocomplete="off"></label>
    <label class="consent"><input type="checkbox" name="consent" required><span>I confirm this submission is non-identifying and understand it will be reviewed before publication. Only approved reports will appear publicly.</span></label>
    <p class="form-alert" id="formAlert" role="status" aria-live="polite"></p>
