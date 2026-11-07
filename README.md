@@ -11,8 +11,9 @@ A mobile-first U.S. community information map with moderated report submissions,
 - Cloudflare Pages Functions API backed by D1.
 - Submissions remain private and pending until a moderator approves them.
 - Public reports are delayed at least 24 hours and coordinates are rounded to one decimal degree (roughly 10–11 km).
-- Optional community resource photo uploads (JPEG prepared in-browser to remove EXIF metadata, maximum 2 MB) are stored privately in Cloudflare R2 and remain pending until manual review. Only non-identifying public resource notices, legal-help flyers and community information signs are allowed; no people, vehicles, enforcement scenes, faces, plates, private documents or addresses.
-- Rejected report photos are deleted from R2. Approved photos are served only after the same 24-hour public delay as their report.
+- Optional single photo upload: JPG, PNG or WebP is resized and re-encoded in the browser as WebP (target 50 KB; hard maximum 100 KB), which removes embedded EXIF metadata. The image is stored as a BLOB in D1 and remains private while pending moderation.
+- Only non-identifying public resource notices, legal-help flyers and community information signs are allowed; never upload people, vehicles, enforcement scenes, faces, plates, private documents or addresses. Rejected photos are deleted from D1. Approved photos are served only after the same 24-hour public delay as their report.
+- Photo upload uses the existing D1 database; no R2 bucket or R2 binding is required. D1 storage and request quotas still apply, so monitor usage and keep uploads optional.
 - Private moderation screen at `/admin/`, protected by a secret token.
 - Legal resources, Privacy, Terms, sitemap, robots.txt and security headers.
 
@@ -31,7 +32,7 @@ This map is **not** a live incident tracker, emergency alert system or a tool fo
 1. Cloudflare Dashboard → **Storage & databases** → **D1 SQL Database** → **Create**.
 2. Name it `peopleoverpapers-reports`.
 3. Open the database → **Console**.
-4. Run `migrations/0001_init.sql` first, then run `migrations/0002_add_observed_time.sql` and `migrations/0003_add_report_photos.sql` in the same D1 database.
+4. Run `migrations/0001_init.sql` first, then run `migrations/0002_add_observed_time.sql`, `migrations/0003_add_report_photos.sql` (legacy column; retained for compatibility) and `migrations/0004_d1_report_photos.sql` in the same D1 database.
 
 ### 3. Bind D1 to Pages
 1. Open Workers & Pages → your Pages project → **Settings** → **Functions**.
@@ -40,11 +41,8 @@ This map is **not** a live incident tracker, emergency alert system or a tool fo
    - D1 database: `peopleoverpapers-reports`
 3. Save and redeploy the latest deployment so Functions receive the binding.
 
-### 4. Create and bind private photo storage
-1. Cloudflare Dashboard → **R2 Object Storage** → **Create bucket**.
-2. Name it `peopleoverpapers-report-photos` and keep it private (do not enable public bucket access).
-3. In Pages → **Settings** → **Functions** → **R2 bucket bindings**, add binding variable `REPORT_PHOTOS` and select that bucket.
-4. Save the binding. Photo uploads will remain disabled until this binding is available.
+### 4. Photo storage
+Photo images are stored in the D1 `report_photos` table. No R2 bucket or `REPORT_PHOTOS` binding is needed.
 
 ### 5. Set the moderation secret
 1. In the same Pages project, open **Settings** → **Variables and Secrets**.
@@ -65,13 +63,15 @@ Open Pages → **Custom domains** → **Set up a custom domain** → add `people
 - Confirm it is not public immediately; public API only releases approved records after the 24-hour delay.
 - Delete the test record from D1 after verification.
 - Test filters, map search, mobile form, Privacy, Terms and resources pages.
-- Test a resource photo submission, inspect it in `/admin/`, reject one test photo and verify it is removed; approve a separate harmless resource image and confirm it is not public until after the 24-hour delay.
+- Test an optional WebP photo submission, inspect it in `/admin/`, reject one test photo and verify its row is removed; approve a separate harmless resource image and confirm it is not public until after the 24-hour delay. Test a submission without a photo too.
 
 ## API
 - `GET /api/reports`: returns approved reports after the 24-hour delay.
 - `POST /api/reports`: accepts a submission into pending moderation.
 - `GET /api/admin/reports`: lists pending submissions; requires `Authorization: Bearer <MODERATION_TOKEN>`.
-- `PATCH /api/admin/reports`: approve or reject a pending report; requires the same secret.
+- `PATCH /api/admin/reports`: approve or reject a pending report; rejecting also deletes its photo; requires the same secret.
+- `GET /api/admin/report-photo/:id`: serves a pending photo to an authenticated moderator.
+- `GET /api/report-photo/:id`: serves an approved photo only after the 24-hour delay.
 
 ## SEO
 - Canonical homepage: https://peopleoverpapersmap.com/
