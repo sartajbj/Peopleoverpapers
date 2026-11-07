@@ -1,6 +1,6 @@
 # People Over Papers Map
 
-Website: **https://peopleoverpapersmap.com/**  
+Website: **https://www.peopleoverpapersmap.com/**  
 Contact: **peopleoverpapersmap@gmail.com**
 
 A mobile-first U.S. community information map with moderated report submissions, approximate map locations, public report delay and curated support resources.
