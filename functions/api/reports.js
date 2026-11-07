@@ -28,7 +28,7 @@ export async function onRequestPost({request,env}) {
  const lat=Number(form.get("lat")),lng=Number(form.get("lng")),description=clean(form.get("description"),500),date=clean(form.get("observedAt"),10),time=clean(form.get("observedTime"),5);
  if(form.get("consent")!=="on") return json({error:"Please confirm the privacy and review conditions before submitting."},400);
  if(!ALLOWED.has(category)||!/^[A-Za-z][A-Za-z .'-]{1,59}$/.test(city)||unsafeText(city)||/[0-9,#]/.test(city)||!(state===""||/^[A-Z]{2}$/.test(state))||!Number.isFinite(lat)||!Number.isFinite(lng)||lat<24||lat>50||lng< -125||lng> -66) return json({error:"Please provide a valid U.S. category, city or location, and approximate U.S. map location."},400);
- if(description.length<20||unsafeText(description)) return json({error:"Please write at least 20 characters and remove phone numbers, email addresses, street addresses and identifying details."},400);
+ if(description.length<5||unsafeText(description)) return json({error:"Please write at least 5 characters and remove phone numbers, email addresses, street addresses and identifying details."},400);
  if((time && !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time))||!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(Date.parse(date))||date>new Date().toISOString().slice(0,10)) return json({error:"Please choose a valid date and time that are not in the future."},400);
  const photo=form.get("photo");let photoBytes=null;
  if(photo&&typeof photo==="object"&&photo.size>0){
