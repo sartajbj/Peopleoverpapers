@@ -30,7 +30,7 @@
     </div>
    </article>`).join("");
   for(const img of items.querySelectorAll("img[data-photo-id]")){
-   try{const response=await fetch("/api/admin/report-photo/"+encodeURIComponent(img.dataset.photoId),{headers:{Authorization:"Bearer "+token}});if(!response.ok)throw new Error("Photo unavailable");const blob=await response.blob();img.src=URL.createObjectURL(blob);}
+   try{const response=await fetch("/api/admin/report-photo/"+encodeURIComponent(img.dataset.photoId),{headers:{Authorization:"Bearer "+token}});if(!response.ok)throw new Error("Photo preview unavailable (HTTP "+response.status+").");const type=response.headers.get("content-type")||"";if(!type.startsWith("image/webp"))throw new Error("Photo preview returned an invalid image type.");const blob=await response.blob();if(!blob.size)throw new Error("Photo preview is empty.");const objectUrl=URL.createObjectURL(blob);img.onload=()=>URL.revokeObjectURL(objectUrl);img.onerror=()=>{URL.revokeObjectURL(objectUrl);img.replaceWith(Object.assign(document.createElement("p"),{className:"moderation-meta",textContent:"Photo file could not be displayed. Do not approve until reviewed."}));};img.src=objectUrl;}
    catch{img.alt="Photo preview unavailable";img.replaceWith(Object.assign(document.createElement("p"),{className:"moderation-meta",textContent:"Photo preview unavailable. Do not approve until reviewed."}));}
   }
   items.querySelectorAll(".moderation-actions button").forEach(button=>button.addEventListener("click",async()=>{
@@ -42,7 +42,7 @@
     await api("/api/admin/reports",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:card.dataset.id,status:button.dataset.status})});
     card.remove();
     const remaining=items.querySelectorAll("[data-id]").length;
-    status.textContent=button.dataset.status==="approved"?"Report approved. It will be eligible for the public feed after the 24-hour delay.":"Report rejected and kept off the public map.";
+    status.textContent=button.dataset.status==="approved"?"Report approved. It will appear in the public feed after approval.":"Report rejected and kept off the public map.";
     if(!remaining)items.innerHTML='<div class="moderation-card"><h2>All caught up</h2><p>No pending reports. New submissions will appear here.</p></div>';
    }catch(error){status.textContent=error.message;buttons.forEach(item=>item.disabled=false);}
   }));
