@@ -23,11 +23,16 @@
     <h2>${esc(report.city)}, ${esc(report.state)}</h2>
     <p>${esc(report.description)}</p>
     <div class="moderation-meta">Observed: ${esc(report.observed_date)} ${esc(report.observed_time||"time not supplied")} · Submitted: ${esc(report.submitted_at)}</div>
+    ${report.has_photo?'<div class="moderation-photo-wrap"><p class="moderation-meta">Optional image · inspect for identifying details before approval</p><img class="moderation-photo" alt="Pending community resource photo" data-photo-id="'+esc(report.id)+'"></div>':''}
     <div class="moderation-actions">
      <button class="button approve" type="button" data-status="approved">✓ Approve</button>
      <button class="button reject" type="button" data-status="rejected">✕ Reject</button>
     </div>
    </article>`).join("");
+  for(const img of items.querySelectorAll("img[data-photo-id]")){
+   try{const response=await fetch("/api/admin/report-photo/"+encodeURIComponent(img.dataset.photoId),{headers:{Authorization:"Bearer "+token}});if(!response.ok)throw new Error("Photo unavailable");const blob=await response.blob();img.src=URL.createObjectURL(blob);}
+   catch{img.alt="Photo preview unavailable";img.replaceWith(Object.assign(document.createElement("p"),{className:"moderation-meta",textContent:"Photo preview unavailable. Do not approve until reviewed."}));}
+  }
   items.querySelectorAll(".moderation-actions button").forEach(button=>button.addEventListener("click",async()=>{
    const card=button.closest("[data-id]");
    const buttons=card.querySelectorAll("button");
