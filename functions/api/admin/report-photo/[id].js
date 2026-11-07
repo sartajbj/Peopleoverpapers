@@ -1,5 +1,5 @@
 const json=(message,status)=>new Response(message,{status,headers:{"content-type":"text/plain; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"}});
-function authorized(request,env){const token=request.headers.get("authorization")?.replace(/^Bearer\\s+/i,"");return !!env.MODERATION_TOKEN&&!!token&&token===env.MODERATION_TOKEN;}
+function authorized(request,env){const token=request.headers.get("authorization")?.replace(/^Bearer\s+/i,"");return !!env.MODERATION_TOKEN&&!!token&&token===env.MODERATION_TOKEN;}
 export async function onRequestGet({request,params,env}) {
  if(!env.DB||!env.MODERATION_TOKEN)return json("Moderation photo service unavailable.",503);
  if(!authorized(request,env))return json("Unauthorized.",401);
