@@ -191,10 +191,15 @@
     searchMarker=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:3,fillColor:"#07545a",fillOpacity:1}).addTo(map);
     if($("locationStatus"))$("locationStatus").textContent="Approximate map location found for "+query+". You can adjust it using “Choose on map”.";
   }
-  if(cityInput)cityInput.addEventListener("change",()=>{
-    $("reportLat").value="";$("reportLng").value="";
-    resolveEnteredLocation().catch(error=>{if($("locationStatus"))$("locationStatus").textContent=error.message;});
-  });
+  if(cityInput){
+    cityInput.addEventListener("input",()=>{
+      $("reportLat").value="";$("reportLng").value="";
+      if($("locationStatus"))$("locationStatus").textContent="Location will be found automatically when you submit.";
+    });
+    cityInput.addEventListener("change",()=>{
+      resolveEnteredLocation().catch(error=>{if($("locationStatus"))$("locationStatus").textContent=error.message;});
+    });
+  }
 
   let preparedPhoto=null,previewUrl=null;
   function clearPhoto(){
@@ -249,8 +254,10 @@
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
     if(!form.reportValidity())return;
     if(!$("reportLat").value||!$("reportLng").value){
+      btn.disabled=true;
       try{await resolveEnteredLocation();}
-      catch(error){alert.className="form-alert error";alert.textContent=error.message;return;}
+      catch(error){alert.className="form-alert error";alert.textContent=error.message;btn.disabled=false;return;}
+      finally{if(!$("reportLat").value||!$("reportLng").value)btn.disabled=false;}
     }
     const data=Object.fromEntries(new FormData(form).entries());
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
