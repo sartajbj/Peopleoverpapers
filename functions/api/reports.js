@@ -7,7 +7,7 @@ function validWebp(bytes){return bytes.length>=12&&bytes[0]===0x52&&bytes[1]===0
 export async function onRequestGet({env}) {
  if(!env.DB) return json({error:"Report service is not configured yet."},503);
  try{
-  const {results=[]}=await env.DB.prepare("SELECT r.id,r.category,r.city,r.state,r.lat,r.lng,r.description,r.observed_date,r.observed_time,r.submitted_at,CASE WHEN p.report_id IS NULL THEN 0 ELSE 1 END AS has_photo FROM reports r LEFT JOIN report_photos p ON p.report_id=r.id WHERE r.status='approved' AND r.submitted_at <= datetime('now','-24 hours') ORDER BY r.submitted_at DESC LIMIT 100").all();
+  const {results=[]}=await env.DB.prepare("SELECT r.id,r.category,r.city,r.state,r.lat,r.lng,r.description,r.observed_date,r.observed_time,r.submitted_at,CASE WHEN p.report_id IS NULL THEN 0 ELSE 1 END AS has_photo FROM reports r LEFT JOIN report_photos p ON p.report_id=r.id WHERE r.status='approved' ORDER BY r.submitted_at DESC LIMIT 100").all();
   const safe=results.filter(r=>/^[A-Za-z][A-Za-z .'-]{1,59}$/.test(String(r.city||''))&&!unsafeText(r.city)&&!unsafeText(r.description)&&!/[0-9,#]/.test(String(r.city||'')));
   return json({reports:safe.slice(0,20)});
  }catch{return json({error:"Unable to load reports."},500);}
