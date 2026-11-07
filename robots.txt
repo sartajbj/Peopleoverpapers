@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
-Sitemap: https://peopleoverpapersmap.com/sitemap.xml
+Sitemap: https://www.peopleoverpapersmap.com/sitemap.xml
