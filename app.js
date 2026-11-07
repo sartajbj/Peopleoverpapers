@@ -172,7 +172,46 @@
   $("searchMap").addEventListener("click",searchPlace);
   $("mapSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchPlace();}});
   const dialog=$("reportDialog"),form=$("reportForm");
-  function close(){dialog.close();form.reset();$("formAlert").textContent="";if($("locationStatus"))$("locationStatus").textContent="No location selected yet.";}
+  const photoInput=$("reportPhoto"),photoStatus=$("photoStatus"),photoPreview=$("photoPreview");
+  let preparedPhoto=null,previewUrl=null;
+  function clearPhoto(){
+    preparedPhoto=null;
+    if(previewUrl)URL.revokeObjectURL(previewUrl);
+    previewUrl=null;
+    if(photoPreview){photoPreview.removeAttribute("src");photoPreview.hidden=true;}
+    if(photoStatus)photoStatus.textContent="No photo selected. Your report can be submitted without one.";
+  }
+  function imageBlob(file,type,quality){return new Promise((resolve,reject)=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{URL.revokeObjectURL(url);const scale=Math.min(1,1280/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("This image could not be processed.")),type,quality);};
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("Please choose a valid image file."));};
+    img.src=url;
+  });}
+  async function preparePhoto(file){
+    if(!file)return null;
+    if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Choose a JPG, PNG or WebP image.");
+    let blob=null;
+    for(const quality of [.82,.72,.62,.52,.44]){
+      blob=await imageBlob(file,"image/webp",quality);
+      if(blob.size<=50*1024)break;
+    }
+    if(blob.size>100*1024){
+      const imgBlob=await imageBlob(file,"image/webp",.4);
+      blob=imgBlob;
+    }
+    if(blob.size>100*1024)throw new Error("This image is still over 100 KB after compression. Please choose a smaller image.");
+    return new File([blob],"community-photo.webp",{type:"image/webp",lastModified:Date.now()});
+  }
+  if(photoInput)photoInput.addEventListener("change",async()=>{
+    clearPhoto();const file=photoInput.files?.[0];if(!file)return;
+    photoStatus.textContent="Preparing a smaller, metadata-free WebP image…";
+    try{
+      preparedPhoto=await preparePhoto(file);
+      previewUrl=URL.createObjectURL(preparedPhoto);photoPreview.src=previewUrl;photoPreview.hidden=false;
+      photoStatus.textContent="Ready: "+Math.round(preparedPhoto.size/1024)+" KB WebP. It will remain private until moderator approval.";
+    }catch(error){photoInput.value="";clearPhoto();photoStatus.textContent=error.message;}
+  });
+  function close(){dialog.close();form.reset();clearPhoto();$("formAlert").textContent="";if($("locationStatus"))$("locationStatus").textContent="No location selected yet.";}
   $("openReport").addEventListener("click",()=>dialog.showModal());
   $("pickLocation").addEventListener("click",()=>{
     pickingLocation=true;
@@ -194,11 +233,12 @@
     try{
       const payload=new FormData();
       for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website","consent"]) payload.append(key,String(data[key]||""));
+      if(preparedPhoto)payload.append("photo",preparedPhoto,preparedPhoto.name);
       const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
       await readApiResponse(res);
       alert.textContent="✓ Thank you! Your report has been submitted and is awaiting admin review.";
       alert.className="form-alert success";
-      form.reset();
+      form.reset();clearPhoto();
       setTimeout(()=>{dialog.close();alert.textContent="";alert.className="form-alert";if($("official-map"))$("official-map").scrollIntoView({behavior:"smooth",block:"start"});},2000);
     }catch(err){alert.className="form-alert error";alert.textContent=err.message||"Network error. Please try again.";}
     finally{btn.disabled=false;}
