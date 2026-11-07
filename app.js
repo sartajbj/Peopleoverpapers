@@ -174,24 +174,26 @@
   const dialog=$("reportDialog"),form=$("reportForm");
   const photoInput=$("reportPhoto"),photoStatus=$("photoStatus"),photoPreview=$("photoPreview");
   const cityInput=$("reportCity");
-  if(cityInput) cityInput.addEventListener("change",async()=>{
-    const query=cityInput.value.trim();if(query.length<2)return;
+  async function resolveEnteredLocation(){
+    const query=cityInput?.value.trim()||"";
+    if(query.length<2)throw new Error("Enter a U.S. city or location, such as Washington, DC.");
     if($("locationStatus"))$("locationStatus").textContent="Finding an approximate U.S. map location…";
-    try{
-      const url="https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=us&limit=1&addressdetails=1&q="+encodeURIComponent(query);
-      const response=await fetch(url,{headers:{Accept:"application/json"}});if(!response.ok)throw new Error();
-      const hits=await response.json();if(!Array.isArray(hits)||!hits.length)throw new Error();
-      const lat=Number(hits[0].lat),lng=Number(hits[0].lon);
-      if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat<24||lat>50||lng< -125||lng> -66)throw new Error();
-      $("reportLat").value=lat.toFixed(1);$("reportLng").value=lng.toFixed(1);
-      map.setView([lat,lng],10,{animate:false});
-      if(searchMarker)map.removeLayer(searchMarker);
-      searchMarker=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:3,fillColor:"#07545a",fillOpacity:1}).addTo(map);
-      if($("locationStatus"))$("locationStatus").textContent="Approximate map point found for "+query+". You can adjust it with “Choose on map”.";
-    }catch{
-      $("reportLat").value="";$("reportLng").value="";
-      if($("locationStatus"))$("locationStatus").textContent="We couldn't find that U.S. location. Try a city and state, such as Washington, DC, or choose an approximate point on the map.";
-    }
+    const url="https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=us&limit=1&addressdetails=1&q="+encodeURIComponent(query);
+    const response=await fetch(url,{headers:{Accept:"application/json"}});
+    if(!response.ok)throw new Error("Location lookup is temporarily unavailable. Please try again or choose the area on the map.");
+    const hits=await response.json();
+    if(!Array.isArray(hits)||!hits.length)throw new Error("We couldn't find that U.S. location. Try a city and state, or choose an approximate point on the map.");
+    const lat=Number(hits[0].lat),lng=Number(hits[0].lon);
+    if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat<24||lat>50||lng< -125||lng> -66)throw new Error("Please enter a location within the United States.");
+    $("reportLat").value=lat.toFixed(1);$("reportLng").value=lng.toFixed(1);
+    map.setView([lat,lng],10,{animate:false});
+    if(searchMarker)map.removeLayer(searchMarker);
+    searchMarker=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:3,fillColor:"#07545a",fillOpacity:1}).addTo(map);
+    if($("locationStatus"))$("locationStatus").textContent="Approximate map location found for "+query+". You can adjust it using “Choose on map”.";
+  }
+  if(cityInput)cityInput.addEventListener("change",()=>{
+    $("reportLat").value="";$("reportLng").value="";
+    resolveEnteredLocation().catch(error=>{if($("locationStatus"))$("locationStatus").textContent=error.message;});
   });
 
   let preparedPhoto=null,previewUrl=null;
@@ -246,7 +248,10 @@
   form.addEventListener("submit",async e=>{
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
     if(!form.reportValidity())return;
-    if(!form.lat.value||!form.lng.value){alert.textContent="Please enter a U.S. city or location and wait for the approximate map point to be found.";return;}
+    if(!$("reportLat").value||!$("reportLng").value){
+      try{await resolveEnteredLocation();}
+      catch(error){alert.className="form-alert error";alert.textContent=error.message;return;}
+    }
     const data=Object.fromEntries(new FormData(form).entries());
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
     btn.disabled=true; alert.className="form-alert"; alert.textContent="Sending your report for manual review…";
