@@ -181,9 +181,9 @@
     if(photoPreview){photoPreview.removeAttribute("src");photoPreview.hidden=true;}
     if(photoStatus)photoStatus.textContent="No photo selected. Your report can be submitted without one.";
   }
-  function imageBlob(file,type,quality){return new Promise((resolve,reject)=>{
+  function imageBlob(file,type,quality,maxDimension){return new Promise((resolve,reject)=>{
     const img=new Image(),url=URL.createObjectURL(file);
-    img.onload=()=>{URL.revokeObjectURL(url);const scale=Math.min(1,1280/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("This image could not be processed.")),type,quality);};
+    img.onload=()=>{URL.revokeObjectURL(url);const scale=Math.min(1,maxDimension/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));const ctx=canvas.getContext("2d");if(!ctx){reject(new Error("Image processing is unavailable in this browser."));return;}ctx.drawImage(img,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("This image could not be processed.")),type,quality);};
     img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("Please choose a valid image file."));};
     img.src=url;
   });}
@@ -191,13 +191,12 @@
     if(!file)return null;
     if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Choose a JPG, PNG or WebP image.");
     let blob=null;
-    for(const quality of [.82,.72,.62,.52,.44]){
-      blob=await imageBlob(file,"image/webp",quality);
+    for(const dimension of [1280,1024,800,640]){
+      for(const quality of [.82,.70,.58,.46]){
+        blob=await imageBlob(file,"image/webp",quality,dimension);
+        if(blob.size<=50*1024)break;
+      }
       if(blob.size<=50*1024)break;
-    }
-    if(blob.size>100*1024){
-      const imgBlob=await imageBlob(file,"image/webp",.4);
-      blob=imgBlob;
     }
     if(blob.size>100*1024)throw new Error("This image is still over 100 KB after compression. Please choose a smaller image.");
     return new File([blob],"community-photo.webp",{type:"image/webp",lastModified:Date.now()});
