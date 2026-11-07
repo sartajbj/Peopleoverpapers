@@ -22,7 +22,7 @@ export async function onRequestPost({request,env}) {
  if(form.get("website")) return json({received:true},202);
  const category=clean(form.get("category"),20);
  const enteredLocation=clean(form.get("city"),80);
- const locationMatch=enteredLocation.match(/^(.+?)(?:,\\s*|\\s+)([A-Za-z]{2})$/);
+ const locationMatch=enteredLocation.match(/^(.+?)(?:,\s*|\s+)([A-Za-z]{2})$/);
  const city=clean(locationMatch?locationMatch[1]:enteredLocation,60);
  const state=locationMatch?locationMatch[2].toUpperCase():"";
  const lat=Number(form.get("lat")),lng=Number(form.get("lng")),description=clean(form.get("description"),500),date=clean(form.get("observedAt"),10),time=clean(form.get("observedTime"),5);
