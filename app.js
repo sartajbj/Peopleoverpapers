@@ -139,10 +139,10 @@
       const stateName=addr.state||"";
       const stateMap={"Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY","District of Columbia":"DC"};
       if(city && !$("reportForm").elements.city.value) $("reportForm").elements.city.value=city;
-      if(stateMap[stateName] && !$("reportForm").elements.state.value) $("reportForm").elements.state.value=stateMap[stateName];
-      if($("locationStatus")) $("locationStatus").textContent=(city?city+", ":"")+"Approximate area selected. Check city/state before submitting.";
+      
+      if($("locationStatus")) $("locationStatus").textContent=(city?city+", ":"")+"Approximate area selected. Check the location before submitting.";
     }catch{
-      if($("locationStatus")) $("locationStatus").textContent="Approximate area selected. Please enter city and state manually.";
+      if($("locationStatus")) $("locationStatus").textContent="Approximate area selected. Please enter a U.S. city or location manually.";
     }
   });
   document.querySelectorAll(".filter-row input").forEach(x=>x.addEventListener("change",render));
@@ -173,6 +173,27 @@
   $("mapSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchPlace();}});
   const dialog=$("reportDialog"),form=$("reportForm");
   const photoInput=$("reportPhoto"),photoStatus=$("photoStatus"),photoPreview=$("photoPreview");
+  const cityInput=$("reportCity");
+  if(cityInput) cityInput.addEventListener("change",async()=>{
+    const query=cityInput.value.trim();if(query.length<2)return;
+    if($("locationStatus"))$("locationStatus").textContent="Finding an approximate U.S. map location…";
+    try{
+      const url="https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=us&limit=1&addressdetails=1&q="+encodeURIComponent(query);
+      const response=await fetch(url,{headers:{Accept:"application/json"}});if(!response.ok)throw new Error();
+      const hits=await response.json();if(!Array.isArray(hits)||!hits.length)throw new Error();
+      const lat=Number(hits[0].lat),lng=Number(hits[0].lon);
+      if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat<24||lat>50||lng< -125||lng> -66)throw new Error();
+      $("reportLat").value=lat.toFixed(1);$("reportLng").value=lng.toFixed(1);
+      map.setView([lat,lng],10,{animate:false});
+      if(searchMarker)map.removeLayer(searchMarker);
+      searchMarker=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:3,fillColor:"#07545a",fillOpacity:1}).addTo(map);
+      if($("locationStatus"))$("locationStatus").textContent="Approximate map point found for "+query+". You can adjust it with “Choose on map”.";
+    }catch{
+      $("reportLat").value="";$("reportLng").value="";
+      if($("locationStatus"))$("locationStatus").textContent="We couldn't find that U.S. location. Try a city and state, such as Washington, DC, or choose an approximate point on the map.";
+    }
+  });
+
   let preparedPhoto=null,previewUrl=null;
   function clearPhoto(){
     preparedPhoto=null;
@@ -225,13 +246,13 @@
   form.addEventListener("submit",async e=>{
     e.preventDefault(); const btn=$("submitReport"),alert=$("formAlert");
     if(!form.reportValidity())return;
-    if(!form.lat.value||!form.lng.value){alert.textContent="Please choose an approximate area on the map first.";return;}
+    if(!form.lat.value||!form.lng.value){alert.textContent="Please enter a U.S. city or location and wait for the approximate map point to be found.";return;}
     const data=Object.fromEntries(new FormData(form).entries());
     if(!data.consent){alert.textContent="Please confirm the privacy and review conditions.";return;}
     btn.disabled=true; alert.className="form-alert"; alert.textContent="Sending your report for manual review…";
     try{
       const payload=new FormData();
-      for(const key of ["category","city","state","lat","lng","observedAt","observedTime","description","website","consent"]) payload.append(key,String(data[key]||""));
+      for(const key of ["category","city","lat","lng","observedAt","observedTime","description","website","consent"]) payload.append(key,String(data[key]||""));
       if(preparedPhoto)payload.append("photo",preparedPhoto,preparedPhoto.name);
       const res=await fetch("/api/reports",{method:"POST",headers:{Accept:"application/json"},body:payload});
       await readApiResponse(res);
