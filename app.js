@@ -174,22 +174,36 @@
   const dialog=$("reportDialog"),form=$("reportForm");
   const photoInput=$("reportPhoto"),photoStatus=$("photoStatus"),photoPreview=$("photoPreview");
   const cityInput=$("reportCity");
+  const stateAbbreviations={Alabama:"AL",Alaska:"AK",Arizona:"AZ",Arkansas:"AR",California:"CA",Colorado:"CO",Connecticut:"CT",Delaware:"DE",Florida:"FL",Georgia:"GA",Hawaii:"HI",Idaho:"ID",Illinois:"IL",Indiana:"IN",Iowa:"IA",Kansas:"KS",Kentucky:"KY",Louisiana:"LA",Maine:"ME",Maryland:"MD",Massachusetts:"MA",Michigan:"MI",Minnesota:"MN",Mississippi:"MS",Missouri:"MO",Montana:"MT",Nebraska:"NE",Nevada:"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND",Ohio:"OH",Oklahoma:"OK",Oregon:"OR",Pennsylvania:"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD",Tennessee:"TN",Texas:"TX",Utah:"UT",Vermont:"VT",Virginia:"VA",Washington:"WA","West Virginia":"WV",Wisconsin:"WI",Wyoming:"WY","District of Columbia":"DC"};
+  function safeCityState(address,fallback){
+    const place=address?.city||address?.town||address?.village||address?.municipality||address?.borough||address?.hamlet||address?.county||"";
+    const stateName=address?.state||"";
+    const stateCode=stateAbbreviations[stateName]||(/^[A-Z]{2}$/.test(stateName)?stateName:"");
+    const cleanPlace=String(place).replace(/[^A-Za-z .'-]/g," ").replace(/\\s+/g," ").trim().slice(0,55);
+    if(cleanPlace)return stateCode?cleanPlace+", "+stateCode:cleanPlace;
+    const safeFallback=String(fallback||"").trim();
+    return /^[A-Za-z][A-Za-z .'-]{1,59}(?:,\\s*[A-Za-z]{2})?$/.test(safeFallback)?safeFallback:"";
+  }
   async function resolveEnteredLocation(){
     const query=cityInput?.value.trim()||"";
-    if(query.length<2)throw new Error("Enter a U.S. city or location, such as Washington, DC.");
+    if(query.length<2)throw new Error("Enter a U.S. city or location, such as Fort Lauderdale, FL.");
     if($("locationStatus"))$("locationStatus").textContent="Finding an approximate U.S. map location…";
     const url="https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=us&limit=1&addressdetails=1&q="+encodeURIComponent(query);
     const response=await fetch(url,{headers:{Accept:"application/json"}});
     if(!response.ok)throw new Error("Location lookup is temporarily unavailable. Please try again or choose the area on the map.");
     const hits=await response.json();
     if(!Array.isArray(hits)||!hits.length)throw new Error("We couldn't find that U.S. location. Try a city and state, or choose an approximate point on the map.");
-    const lat=Number(hits[0].lat),lng=Number(hits[0].lon);
+    const hit=hits[0],lat=Number(hit.lat),lng=Number(hit.lon);
     if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat<24||lat>50||lng< -125||lng> -66)throw new Error("Please enter a location within the United States.");
+    const publicLocation=safeCityState(hit.address,query);
+    if(!publicLocation)throw new Error("We found the map point, but couldn't identify a safe city or area name. Please enter a city and state, such as Fort Lauderdale, FL.");
+    // Never send a street address to the API or store it in the report.
+    cityInput.value=publicLocation;
     $("reportLat").value=lat.toFixed(1);$("reportLng").value=lng.toFixed(1);
     map.setView([lat,lng],10,{animate:false});
     if(searchMarker)map.removeLayer(searchMarker);
     searchMarker=L.circleMarker([lat,lng],{radius:8,color:"#fff",weight:3,fillColor:"#07545a",fillOpacity:1}).addTo(map);
-    if($("locationStatus"))$("locationStatus").textContent="Approximate map location found for "+query+". You can adjust it using “Choose on map”.";
+    if($("locationStatus"))$("locationStatus").textContent="Approximate map location found for "+publicLocation+". Your exact street address is not included in the report.";
   }
   if(cityInput){
     cityInput.addEventListener("input",()=>{
