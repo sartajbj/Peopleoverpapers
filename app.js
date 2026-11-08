@@ -179,10 +179,10 @@
     const place=address?.city||address?.town||address?.village||address?.municipality||address?.borough||address?.hamlet||address?.county||"";
     const stateName=address?.state||"";
     const stateCode=stateAbbreviations[stateName]||(/^[A-Z]{2}$/.test(stateName)?stateName:"");
-    const cleanPlace=String(place).replace(/[^A-Za-z .'-]/g," ").replace(/\\s+/g," ").trim().slice(0,55);
+    const cleanPlace=String(place).replace(/[^A-Za-z .'-]/g," ").replace(/\s+/g," ").trim().slice(0,55);
     if(cleanPlace)return stateCode?cleanPlace+", "+stateCode:cleanPlace;
     const safeFallback=String(fallback||"").trim();
-    return /^[A-Za-z][A-Za-z .'-]{1,59}(?:,\\s*[A-Za-z]{2})?$/.test(safeFallback)?safeFallback:"";
+    return /^[A-Za-z][A-Za-z .'-]{1,59}(?:,\s*[A-Za-z]{2})?$/.test(safeFallback)?safeFallback:"";
   }
   async function resolveEnteredLocation(){
     const query=cityInput?.value.trim()||"";
