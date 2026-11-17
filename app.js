@@ -255,7 +255,7 @@
     }catch(error){photoInput.value="";clearPhoto();photoStatus.textContent=error.message;}
   });
   function close(){dialog.close();form.reset();clearPhoto();$("formAlert").textContent="";if($("locationStatus"))$("locationStatus").textContent="No location selected yet.";}
-  $("openReport").addEventListener("click",()=>dialog.showModal());
+  $("openReport").addEventListener("click",()=>dialog.showModal()); $("mapSubmitReport").addEventListener("click",()=>dialog.showModal());
   $("pickLocation").addEventListener("click",()=>{
     pickingLocation=true;
     dialog.close();
